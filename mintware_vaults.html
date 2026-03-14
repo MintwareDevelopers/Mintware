@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mintware — Vaults</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#0052FF;--blue-dim:rgba(0,82,255,0.07);--blue-mid:rgba(0,82,255,0.14);
+  --ink:#1A1A2E;--ink-2:#3A3C52;--ink-3:#8A8C9E;
+  --surface:#F7F6FF;--white:#ffffff;
+  --green:#16a34a;--green-bg:#f0fdf4;--green-border:#bbf7d0;
+  --border:rgba(26,26,46,0.08);--border-strong:rgba(26,26,46,0.13);
+  --dark:#0A0D14;--dark-2:#11141E;--dark-3:#181C29;
+  --dark-border:rgba(255,255,255,0.06);
+  --dark-text:rgba(255,255,255,0.88);--dark-sub:rgba(255,255,255,0.36);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--surface);color:var(--ink)}
+
+/* NAV */
+.app-nav{
+  background:rgba(255,255,255,0.94);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+  padding:0 28px;display:flex;align-items:center;
+  position:sticky;top:0;z-index:100;height:56px;gap:16px;
+}
+.app-logo{font-family:Georgia,serif;font-size:18px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px;flex-shrink:0}
+.app-logo-mark{width:22px;height:22px;border-radius:5px;background:var(--blue);display:flex;align-items:center;justify-content:center}
+.app-logo-mark svg{width:12px;height:12px;fill:white}
+.wallet-search{flex:1;max-width:420px;position:relative}
+.wallet-search input{
+  width:100%;padding:8px 14px 8px 36px;
+  border:1.5px solid var(--border-strong);border-radius:20px;
+  font-size:12px;font-family:'DM Mono',monospace;color:var(--ink);
+  background:var(--surface);outline:none;transition:all 0.15s;
+}
+.wallet-search input:focus{border-color:var(--blue);background:var(--white)}
+.wallet-search input::placeholder{color:var(--ink-3);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px}
+.wallet-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none;opacity:0.4}
+.app-nav-tabs{display:flex;align-items:stretch;gap:0;margin-left:8px}
+.app-tab{
+  padding:0 16px;font-size:13px;font-weight:500;color:var(--ink-3);
+  cursor:pointer;border-bottom:2px solid transparent;
+  display:flex;align-items:center;height:56px;transition:all 0.15s;white-space:nowrap;
+}
+.app-tab:hover{color:var(--ink)}
+.app-tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+.app-nav-right{margin-left:auto;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.connected-pill{
+  display:flex;align-items:center;gap:6px;
+  background:var(--surface);border:1px solid var(--border-strong);
+  border-radius:20px;padding:6px 12px;font-size:11px;font-weight:600;
+  color:var(--ink-2);font-family:'DM Mono',monospace;cursor:pointer;transition:all 0.15s;
+}
+.connected-pill:hover{border-color:var(--blue);color:var(--blue)}
+.connected-dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+
+/* ══ TOP SNAPSHOT ══ */
+.vault-top{background:var(--white);padding:28px 28px 0;border-bottom:1px solid var(--border)}
+.vault-top-header{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  margin-bottom:24px;flex-wrap:wrap;gap:16px;
+}
+.vault-top-left h1{font-family:Georgia,serif;font-size:26px;font-weight:700;color:var(--ink);letter-spacing:-0.5px;margin-bottom:4px}
+.vault-top-left p{font-size:13px;color:var(--ink-3)}
+.vault-top-right{display:flex;align-items:center;gap:10px}
+.vault-how-btn{
+  background:var(--surface);color:var(--ink-2);border:1.5px solid var(--border-strong);
+  padding:9px 18px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif;transition:all 0.15s;
+}
+.vault-how-btn:hover{border-color:var(--blue);color:var(--blue)}
+.vault-deposit-btn{
+  background:var(--blue);color:#fff;border:none;padding:10px 22px;
+  border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif;transition:background 0.15s;
+  display:flex;align-items:center;gap:7px;
+}
+.vault-deposit-btn:hover{background:#0040cc}
+
+/* SNAPSHOT STRIP */
+.vault-snapshot{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-top:1px solid var(--border)}
+.snap-stat{padding:16px 20px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:3px}
+.snap-stat:last-child{border-right:none}
+.snap-label{font-size:11px;color:#bbb;text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
+.snap-val{font-size:20px;font-weight:700;color:var(--ink);font-family:'DM Mono',monospace;letter-spacing:-0.5px}
+.snap-sub{font-size:11px;color:#bbb;margin-top:1px}
+.snap-stat.earn{background:var(--green-bg);border-top:2px solid var(--green)}
+.snap-stat.earn .snap-label{color:var(--green)}
+.snap-stat.earn .snap-val{color:#14532d}
+.snap-stat.score-stat{background:var(--blue-dim);border-top:2px solid var(--blue)}
+.snap-stat.score-stat .snap-label{color:var(--blue)}
+.snap-stat.score-stat .snap-val{color:var(--blue)}
+
+/* ══ MY POSITIONS ══ */
+.my-positions{background:var(--white);padding:24px 28px;border-bottom:1px solid var(--border)}
+.section-title{
+  font-family:Georgia,serif;font-size:17px;font-weight:700;color:var(--ink);
+  letter-spacing:-0.3px;margin-bottom:16px;display:flex;align-items:center;gap:10px;
+}
+.section-count{
+  font-size:11px;font-weight:600;background:var(--blue-dim);color:var(--blue);
+  padding:2px 8px;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;
+}
+
+.positions-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.position-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:18px 20px;transition:all 0.15s;cursor:pointer;
+}
+.position-card:hover{border-color:var(--blue);background:#f9fbff}
+
+.pos-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.pos-token{display:flex;align-items:center;gap:10px}
+.pos-icon{
+  width:40px;height:40px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:19px;flex-shrink:0;border:1.5px solid var(--border);
+}
+.pos-name{font-size:15px;font-weight:700;color:var(--ink)}
+.pos-pair{font-size:11px;color:var(--ink-3);margin-top:2px;font-family:'DM Mono',monospace}
+.pos-status{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.pos-badge{
+  font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;
+  letter-spacing:0.3px;
+}
+.badge-active{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+.badge-ai{background:rgba(124,58,237,0.08);color:#7C3AED;border:1px solid rgba(124,58,237,0.18);font-size:9px}
+
+.pos-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:14px}
+.pos-stat{padding:10px 12px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:2px}
+.pos-stat:last-child{border-right:none}
+.pos-stat-label{font-size:10px;color:#bbb;font-weight:600;text-transform:uppercase;letter-spacing:0.3px}
+.pos-stat-val{font-size:14px;font-weight:700;color:var(--ink);font-family:'DM Mono',monospace}
+.pos-stat-val.green{color:var(--green)}
+.pos-stat-val.blue{color:var(--blue)}
+
+/* SCORE WEIGHT BAR */
+.pos-score-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.pos-score-label{font-size:11px;color:var(--ink-3)}
+.pos-score-val{font-size:11px;font-weight:600;color:var(--blue);font-family:'DM Mono',monospace}
+.pos-score-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:14px}
+.pos-score-fill{height:100%;background:var(--blue);border-radius:2px}
+
+.pos-actions{display:flex;gap:8px}
+.pos-btn-secondary{
+  flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:600;
+  cursor:pointer;border:1.5px solid var(--border-strong);background:var(--white);
+  color:var(--ink-2);font-family:'Plus Jakarta Sans',sans-serif;transition:all 0.15s;
+}
+.pos-btn-secondary:hover{border-color:var(--blue);color:var(--blue)}
+.pos-btn-primary{
+  flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:600;
+  cursor:pointer;border:none;background:var(--blue);
+  color:#fff;font-family:'Plus Jakarta Sans',sans-serif;transition:background 0.15s;
+}
+.pos-btn-primary:hover{background:#0040cc}
+
+/* ══ BROWSE VAULTS — dark ══ */
+.browse-section{background:var(--dark);padding:40px 28px 60px}
+.browse-header{text-align:center;margin-bottom:36px}
+.browse-badge{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(0,82,255,0.14);border:1px solid rgba(0,82,255,0.22);
+  border-radius:20px;padding:5px 14px;
+  font-size:12px;font-weight:600;color:#6b9fff;margin-bottom:18px;
+}
+.browse-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--blue)}
+.browse-title{font-family:Georgia,serif;font-size:34px;font-weight:700;color:var(--dark-text);letter-spacing:-1px;margin-bottom:8px}
+.browse-sub{font-size:14px;color:var(--dark-sub);max-width:500px;margin:0 auto;line-height:1.6}
+
+/* BROWSE STATS */
+.browse-stats{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+  max-width:800px;margin:0 auto 36px;
+  border:1px solid var(--dark-border);border-radius:14px;overflow:hidden;
+}
+.browse-stat{
+  padding:18px 24px;border-right:1px solid var(--dark-border);
+  display:flex;flex-direction:column;gap:3px;
+}
+.browse-stat:last-child{border-right:none}
+.browse-stat-label{font-size:11px;color:var(--dark-sub);text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
+.browse-stat-val{font-size:22px;font-weight:700;color:var(--dark-text);font-family:'DM Mono',monospace;letter-spacing:-0.5px}
+.browse-stat-sub{font-size:11px;color:var(--dark-sub);margin-top:1px}
+.browse-stat.earn{border-top:2px solid var(--green)}
+.browse-stat.earn .browse-stat-label{color:#4ade80}
+.browse-stat.earn .browse-stat-val{color:#4ade80}
+
+/* CONTROLS */
+.browse-controls{
+  display:flex;align-items:center;gap:10px;
+  background:var(--dark-2);border:1px solid var(--dark-border);
+  border-radius:12px;padding:12px 16px;margin-bottom:2px;flex-wrap:wrap;
+}
+.browse-search{flex:1;min-width:200px;position:relative}
+.browse-search input{
+  width:100%;padding:8px 14px 8px 34px;
+  background:var(--dark-3);border:1px solid var(--dark-border);
+  border-radius:8px;font-size:13px;color:var(--dark-text);
+  outline:none;transition:border-color 0.15s;font-family:'Plus Jakarta Sans',sans-serif;
+}
+.browse-search input:focus{border-color:rgba(0,82,255,0.5)}
+.browse-search input::placeholder{color:var(--dark-sub)}
+.browse-search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;opacity:0.3;pointer-events:none}
+.browse-filter-group{display:flex;align-items:center;gap:6px}
+.browse-filter{
+  padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;
+  cursor:pointer;border:1px solid var(--dark-border);color:var(--dark-sub);
+  background:transparent;transition:all 0.15s;
+}
+.browse-filter:hover{border-color:rgba(0,82,255,0.4);color:#6b9fff}
+.browse-filter.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.browse-filter-label{font-size:12px;color:var(--dark-sub);margin-right:2px}
+.browse-sort{
+  background:var(--dark-3);border:1px solid var(--dark-border);
+  border-radius:8px;padding:7px 12px;font-size:12px;
+  color:var(--dark-sub);cursor:pointer;
+}
+
+/* VAULT TABLE */
+.vault-table-wrap{
+  background:var(--dark-2);border:1px solid var(--dark-border);
+  border-radius:14px;overflow:hidden;
+}
+.vault-table-head{
+  display:grid;
+  grid-template-columns:2fr 90px 120px 100px 110px 110px 130px 48px;
+  padding:12px 20px;border-bottom:1px solid var(--dark-border);
+}
+.vault-th{
+  font-size:11px;font-weight:600;color:var(--dark-sub);
+  display:flex;align-items:center;gap:4px;cursor:pointer;
+  text-transform:uppercase;letter-spacing:0.5px;transition:color 0.15s;
+}
+.vault-th:not(:first-child){justify-content:flex-end}
+.vault-th:hover{color:var(--dark-text)}
+.vault-th.sorted{color:var(--dark-text)}
+.th-sort{font-size:9px;opacity:0.5}
+
+.vault-row-wrap{border-bottom:1px solid var(--dark-border)}
+.vault-row-wrap:last-child{border-bottom:none}
+.vault-row{
+  display:grid;
+  grid-template-columns:2fr 90px 120px 100px 110px 110px 130px 48px;
+  padding:14px 20px;align-items:center;
+  cursor:pointer;transition:background 0.12s;
+}
+.vault-row:hover{background:rgba(255,255,255,0.025)}
+.vault-row.expanded{background:rgba(255,255,255,0.025)}
+
+/* TOKEN */
+.vault-token-cell{display:flex;align-items:center;gap:12px}
+.vault-token-icon{
+  width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;flex-shrink:0;border:1.5px solid var(--dark-border);
+}
+.vault-token-name{font-size:14px;font-weight:700;color:var(--dark-text)}
+.vault-token-pair{font-size:11px;color:var(--dark-sub);margin-top:2px;font-family:'DM Mono',monospace}
+
+.vault-cell{font-size:13px;color:var(--dark-text);text-align:right;font-family:'DM Mono',monospace}
+.vault-cell.muted{color:var(--dark-sub)}
+.vault-cell.green{color:#4ade80}
+
+.vault-status-cell{text-align:right}
+.vstatus{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;
+}
+.vs-active{background:rgba(22,163,74,0.12);color:#4ade80;border:1px solid rgba(22,163,74,0.2)}
+.vs-hot{background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.2)}
+.vs-new{background:rgba(0,82,255,0.12);color:#6b9fff;border:1px solid rgba(0,82,255,0.2)}
+
+/* SCORE TIER IN ROW */
+.score-tier-cell{text-align:right}
+.score-tier-pill{
+  display:inline-block;font-size:11px;font-weight:600;padding:3px 9px;
+  border-radius:20px;font-family:'DM Mono',monospace;
+}
+.tier-open{background:rgba(74,222,128,0.1);color:#4ade80;border:1px solid rgba(74,222,128,0.2)}
+.tier-locked{background:rgba(255,255,255,0.05);color:var(--dark-sub);border:1px solid var(--dark-border)}
+
+.vault-chevron{display:flex;align-items:center;justify-content:flex-end;color:var(--dark-sub);font-size:14px;transition:transform 0.2s}
+.vault-chevron.open{transform:rotate(180deg)}
+
+/* EXPANDED DETAIL */
+.vault-detail{display:none;padding:0 20px 20px;border-top:1px solid var(--dark-border)}
+.vault-detail.open{display:block}
+.vault-detail-inner{
+  background:var(--dark-3);border:1px solid var(--dark-border);
+  border-radius:12px;padding:20px;
+  display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:20px;
+}
+.detail-col-title{font-size:10px;font-weight:700;color:var(--dark-sub);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+
+/* EARNING SOURCES IN DETAIL */
+.earn-sources{display:flex;flex-direction:column;gap:10px}
+.earn-source{display:flex;align-items:center;justify-content:space-between;font-size:12px}
+.earn-source-left{display:flex;align-items:center;gap:7px;color:var(--dark-sub)}
+.earn-source-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dot-fee{background:#4ade80}
+.dot-mev{background:#fb923c}
+.dot-ai{background:#c084fc}
+.dot-score{background:#60a5fa}
+.earn-source-val{font-size:13px;font-weight:600;font-family:'DM Mono',monospace;color:var(--dark-text)}
+
+.detail-meta{display:flex;flex-direction:column;gap:9px}
+.detail-meta-row{display:flex;justify-content:space-between;font-size:13px}
+.detail-meta-row span:first-child{color:var(--dark-sub)}
+.detail-meta-row span:last-child{color:var(--dark-text);font-weight:600;font-family:'DM Mono',monospace}
+
+/* DEPOSIT PANEL */
+.deposit-panel{display:flex;flex-direction:column;gap:10px}
+.deposit-field{
+  background:rgba(255,255,255,0.04);border:1px solid var(--dark-border);
+  border-radius:10px;padding:12px 14px;
+}
+.deposit-field-label{font-size:10px;color:var(--dark-sub);margin-bottom:6px;display:flex;justify-content:space-between}
+.deposit-field-label span:last-child{color:#6b9fff;cursor:pointer}
+.deposit-field-row{display:flex;align-items:center;gap:8px}
+.deposit-input{
+  flex:1;background:none;border:none;outline:none;
+  font-size:20px;font-weight:700;color:var(--dark-text);
+  font-family:Georgia,serif;letter-spacing:-0.5px;
+}
+.deposit-input::placeholder{color:rgba(255,255,255,0.15)}
+.deposit-token{
+  font-size:12px;font-weight:700;color:var(--dark-text);
+  background:rgba(255,255,255,0.08);padding:4px 10px;border-radius:20px;
+  flex-shrink:0;
+}
+.deposit-btn{
+  background:var(--blue);color:#fff;border:none;
+  padding:12px;border-radius:10px;font-size:14px;font-weight:700;
+  cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;
+  transition:background 0.15s;text-align:center;
+}
+.deposit-btn:hover{background:#0040cc}
+.deposit-note{
+  font-size:11px;color:var(--dark-sub);
+  background:rgba(255,255,255,0.03);border:1px solid var(--dark-border);
+  border-radius:7px;padding:8px 10px;line-height:1.5;
+}
+
+/* SCORE BOOST IN DETAIL */
+.score-boost-panel{display:flex;flex-direction:column;gap:8px}
+.score-boost-row{display:flex;justify-content:space-between;font-size:12px;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:7px;border:1px solid var(--dark-border)}
+.score-boost-row span:first-child{color:var(--dark-sub)}
+.score-boost-row span:last-child{font-weight:600;font-family:'DM Mono',monospace;color:var(--dark-text)}
+.score-boost-you{background:rgba(0,82,255,0.08);border-color:rgba(0,82,255,0.2)}
+.score-boost-you span:last-child{color:#6b9fff}
+</style>
+</head>
+<body>
+
+<nav class="app-nav">
+  <div class="app-logo">
+    <div class="app-logo-mark"><svg viewBox="0 0 14 14"><path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5Z"/></svg></div>
+    Mintware
+  </div>
+  <div class="wallet-search">
+    <span class="wallet-search-icon">⌕</span>
+    <input type="text" placeholder="Paste any wallet address or ENS to explore..."/>
+  </div>
+  <div class="app-nav-tabs">
+    <div class="app-tab">Portfolio</div>
+    <div class="app-tab active">Vaults</div>
+    <div class="app-tab">Leaderboard</div>
+    <div class="app-tab">Referrals</div>
+    <div class="app-tab">Swap</div>
+  </div>
+  <div class="app-nav-right">
+    <div class="connected-pill"><span class="connected-dot"></span>0xf7b1…e2d6</div>
+  </div>
+</nav>
+
+<!-- TOP SNAPSHOT -->
+<div class="vault-top">
+  <div class="vault-top-header">
+    <div class="vault-top-left">
+      <h1>Vaults</h1>
+      <p>Deposit USDC into social LP vaults — your Attribution score weights your share of fees, MEV capture, and rewards</p>
+    </div>
+    <div class="vault-top-right">
+      <button class="vault-how-btn">How vaults work</button>
+      <button class="vault-deposit-btn">+ Deposit USDC</button>
+    </div>
+  </div>
+  <div class="vault-snapshot">
+    <div class="snap-stat earn">
+      <span class="snap-label">Total earned</span>
+      <span class="snap-val">$1,842.10</span>
+      <span class="snap-sub">+$124 this month</span>
+    </div>
+    <div class="snap-stat">
+      <span class="snap-label">Deposited</span>
+      <span class="snap-val">$8,400</span>
+      <span class="snap-sub">Across 2 vaults</span>
+    </div>
+    <div class="snap-stat">
+      <span class="snap-label">Avg APR</span>
+      <span class="snap-val">24.8%</span>
+      <span class="snap-sub">Score-weighted</span>
+    </div>
+    <div class="snap-stat">
+      <span class="snap-label">MEV captured</span>
+      <span class="snap-val">$184.20</span>
+      <span class="snap-sub">Redirected to you</span>
+    </div>
+    <div class="snap-stat score-stat">
+      <span class="snap-label">Attribution score</span>
+      <span class="snap-val">82 / 100</span>
+      <span class="snap-sub">Builder tier · top 5%</span>
+    </div>
+  </div>
+</div>
+
+<!-- MY POSITIONS -->
+<div class="my-positions">
+  <div class="section-title">
+    Your positions <span class="section-count">2 active</span>
+  </div>
+  <div class="positions-grid">
+
+    <!-- POSITION 1 -->
+    <div class="position-card">
+      <div class="pos-top">
+        <div class="pos-token">
+          <div class="pos-icon" style="background:rgba(34,197,94,0.08)">🐸</div>
+          <div>
+            <div class="pos-name">Pepe vault</div>
+            <div class="pos-pair">PEPE / USDC · Ethereum</div>
+          </div>
+        </div>
+        <div class="pos-status">
+          <span class="pos-badge badge-active">● Active</span>
+          <span class="pos-badge badge-ai">✦ AI-managed</span>
+        </div>
+      </div>
+      <div class="pos-stats">
+        <div class="pos-stat">
+          <span class="pos-stat-label">Deposited</span>
+          <span class="pos-stat-val">$5,000</span>
+        </div>
+        <div class="pos-stat">
+          <span class="pos-stat-label">Earned</span>
+          <span class="pos-stat-val green">$1,102</span>
+        </div>
+        <div class="pos-stat">
+          <span class="pos-stat-label">APR</span>
+          <span class="pos-stat-val blue">28.4%</span>
+        </div>
+      </div>
+      <div class="pos-score-row">
+        <span class="pos-score-label">Your score weight (82/100)</span>
+        <span class="pos-score-val">+18% fee boost</span>
+      </div>
+      <div class="pos-score-track"><div class="pos-score-fill" style="width:82%"></div></div>
+      <div class="pos-actions">
+        <button class="pos-btn-secondary">Withdraw</button>
+        <button class="pos-btn-primary">Add USDC</button>
+      </div>
+    </div>
+
+    <!-- POSITION 2 -->
+    <div class="position-card">
+      <div class="pos-top">
+        <div class="pos-token">
+          <div class="pos-icon" style="background:rgba(251,191,36,0.08)">🐕</div>
+          <div>
+            <div class="pos-name">Doge vault</div>
+            <div class="pos-pair">DOGE / USDC · Base</div>
+          </div>
+        </div>
+        <div class="pos-status">
+          <span class="pos-badge badge-active">● Active</span>
+          <span class="pos-badge badge-ai">✦ AI-managed</span>
+        </div>
+      </div>
+      <div class="pos-stats">
+        <div class="pos-stat">
+          <span class="pos-stat-label">Deposited</span>
+          <span class="pos-stat-val">$3,400</span>
+        </div>
+        <div class="pos-stat">
+          <span class="pos-stat-label">Earned</span>
+          <span class="pos-stat-val green">$740</span>
+        </div>
+        <div class="pos-stat">
+          <span class="pos-stat-label">APR</span>
+          <span class="pos-stat-val blue">21.2%</span>
+        </div>
+      </div>
+      <div class="pos-score-row">
+        <span class="pos-score-label">Your score weight (82/100)</span>
+        <span class="pos-score-val">+18% fee boost</span>
+      </div>
+      <div class="pos-score-track"><div class="pos-score-fill" style="width:82%"></div></div>
+      <div class="pos-actions">
+        <button class="pos-btn-secondary">Withdraw</button>
+        <button class="pos-btn-primary">Add USDC</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- BROWSE VAULTS -->
+<div class="browse-section">
+  <div class="browse-header">
+    <div class="browse-badge"><span class="browse-badge-dot"></span>Social LP vaults</div>
+    <div class="browse-title">Browse Vaults</div>
+    <div class="browse-sub">USDC-only deposits. Teams seed the token side. Your score weights your share of every fee, every block.</div>
+  </div>
+
+  <div class="browse-stats">
+    <div class="browse-stat earn">
+      <span class="browse-stat-label">Total fees distributed</span>
+      <span class="browse-stat-val">$284K</span>
+      <span class="browse-stat-sub">All time</span>
+    </div>
+    <div class="browse-stat">
+      <span class="browse-stat-label">Active vaults</span>
+      <span class="browse-stat-val">9</span>
+      <span class="browse-stat-sub">Across 3 chains</span>
+    </div>
+    <div class="browse-stat">
+      <span class="browse-stat-label">Total TVL</span>
+      <span class="browse-stat-val">$1.2M</span>
+      <span class="browse-stat-sub">USDC deposited</span>
+    </div>
+    <div class="browse-stat">
+      <span class="browse-stat-label">MEV captured</span>
+      <span class="browse-stat-val">$48K</span>
+      <span class="browse-stat-sub">Redirected to LPs</span>
+    </div>
+  </div>
+
+  <div class="browse-controls">
+    <div class="browse-search">
+      <span class="browse-search-icon">⌕</span>
+      <input type="text" placeholder="Search vaults by token or team..."/>
+    </div>
+    <div class="browse-filter-group">
+      <span class="browse-filter-label">Chain</span>
+      <div class="browse-filter active" onclick="setBF(this)">All</div>
+      <div class="browse-filter" onclick="setBF(this)">Base</div>
+      <div class="browse-filter" onclick="setBF(this)">Ethereum</div>
+      <div class="browse-filter" onclick="setBF(this)">Sonic</div>
+    </div>
+    <div class="browse-sort">Highest APR ▾</div>
+  </div>
+
+  <div class="vault-table-wrap">
+    <div class="vault-table-head">
+      <div class="vault-th">Vault</div>
+      <div class="vault-th">Status</div>
+      <div class="vault-th sorted">TVL <span class="th-sort">▼</span></div>
+      <div class="vault-th">APR <span class="th-sort">⇅</span></div>
+      <div class="vault-th">MEV share <span class="th-sort">⇅</span></div>
+      <div class="vault-th">Your boost</div>
+      <div class="vault-th">Score tier</div>
+      <div class="vault-th"></div>
+    </div>
+
+    <!-- PEPE -->
+    <div class="vault-row-wrap">
+      <div class="vault-row" onclick="toggleVault(this)">
+        <div class="vault-token-cell">
+          <div class="vault-token-icon" style="background:rgba(34,197,94,0.1)">🐸</div>
+          <div>
+            <div class="vault-token-name">Pepe vault</div>
+            <div class="vault-token-pair">PEPE / USDC · Ethereum</div>
+          </div>
+        </div>
+        <div class="vault-status-cell"><span class="vstatus vs-hot">🔥 Hot</span></div>
+        <div class="vault-cell">$420,000</div>
+        <div class="vault-cell green">28.4%</div>
+        <div class="vault-cell">8.2%</div>
+        <div class="vault-cell green">+18% ✦</div>
+        <div class="score-tier-cell"><span class="score-tier-pill tier-open">Open</span></div>
+        <div class="vault-chevron">▾</div>
+      </div>
+      <div class="vault-detail">
+        <div class="vault-detail-inner">
+          <div>
+            <div class="detail-col-title">Earning sources</div>
+            <div class="earn-sources">
+              <div class="earn-source"><div class="earn-source-left"><span class="earn-source-dot dot-fee"></span>Trading fees</div><div class="earn-source-val">18.2%</div></div>
+              <div class="earn-source"><div class="earn-source-left"><span class="earn-source-dot dot-mev"></span>MEV capture</div><div class="earn-source-val">8.2%</div></div>
+              <div class="earn-source"><div class="earn-source-left"><span class="earn-source-dot dot-ai"></span>AI range opt.</div><div class="earn-source-val">+2.0%</div></div>
+              <div class="earn-source"><div class="earn-source-left"><span class="earn-source-dot dot-score"></span>Score boost (82)</div><div class="earn-source-val">+18%</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-col-title">Vault details</div>
+            <div class="detail-meta">
+              <div class="detail-meta-row"><span>TVL</span><span>$420,000</span></div>
+              <div class="detail-meta-row"><span>Your deposit</span><span>$5,000</span></div>
+              <div class="detail-meta-row"><span>Team seed</span><span>82M PEPE</span></div>
+              <div class="detail-meta-row"><span>Chain</span><span>Ethereum</span></div>
+              <div class="detail-meta-row"><span>Hook</span><span>V4 MEV-aware</span></div>
+              <div class="detail-meta-row"><span>LPs</span><span>284 wallets</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-col-title">Deposit USDC</div>
+            <div class="deposit-panel">
+              <div class="deposit-field">
+                <div class="deposit-field-label"><span>Amount</span><span>Balance: 28 USDC</span></div>
+                <div class="deposit-field-row">
+                  <input class="deposit-input" type="number" placeholder="0"/>
+                  <span class="deposit-token">USDC</span>
+                </div>
+              </div>
+              <button class="deposit-btn">Deposit USDC →</button>
+              <div class="deposit-note">USDC only. Team seeds the PEPE side. No dual-token exposure.</div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-col-title">Score weight tiers</div>
+            <div class="score-boost-panel">
+              <div class="score-boost-row"><span>0–50 score</span><span>Base rate</span></div>
+              <div class="score-boost-row"><span>51–70 score</span><span>+8% boost</span></div>
+              <div class="score-boost-row"><span>71–80 score</span><span>+13% boost</span></div>
+              <div class="score-boost-row score-boost-you"><span>81–90 score (you)</span><span>+18% boost ✦</span></div>
+              <div class="score-boost-row"><span>91–100 score</span><span>+25% boost</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOGE -->
+    <div class="vault-row-wrap">
+      <div class="vault-row" onclick="toggleVault(this)">
+        <div class="vault-token-cell">
+          <div class="vault-token-icon" style="background:rgba(251,191,36,0.1)">🐕</div>
+          <div>
+            <div class="vault-token-name">Doge vault</div>
+            <div class="vault-token-pair">DOGE / USDC · Base</div>
+          </div>
+        </div>
+        <div class="vault-status-cell"><span class="vstatus vs-active">● Active</span></div>
+        <div class="vault-cell">$310,000</div>
+        <div class="vault-cell green">21.2%</div>
+        <div class="vault-cell">6.4%</div>
+        <div class="vault-cell green">+18% ✦</div>
+        <div class="score-tier-cell"><span class="score-tier-pill tier-open">Open</span></div>
+        <div class="vault-chevron">▾</div>
+      </div>
+      <div class="vault-detail">
+        <div class="vault-detail-inner">
+          <div>
+            <div class="detail-col-title">Earning sources</div>
+            <div class="earn-sources">
+              <div class="earn-source"><div class="earn-source-left"><span class="earn-source-dot dot-fee"></span>Trading fees</div><div class="earn-source-val">12.8%</div></div>
+              <div class="earn-source"><div class="earn-source-left"><span class="earn-source-dot dot-mev"></span>MEV capture</div><div class="earn-source-val">6.4%</div></div>
+              <div class="earn-source"><div class="earn-source-left"><span class="earn-source-dot dot-ai"></span>AI range opt.</div><div class="earn-source-val">+2.0%</div></div>
+              <div class="earn-source"><div class="earn-source-left"><span class="earn-source-dot dot-score"></span>Score boost (82)</div><div class="earn-source-val">+18%</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-col-title">Vault details</div>
+            <div class="detail-meta">
+              <div class="detail-meta-row"><span>TVL</span><span>$310,000</span></div>
+              <div class="detail-meta-row"><span>Your deposit</span><span>$3,400</span></div>
+              <div class="detail-meta-row"><span>Team seed</span><span>2.4M DOGE</span></div>
+              <div class="detail-meta-row"><span>Chain</span><span>Base</span></div>
+              <div class="detail-meta-row"><span>Hook</span><span>V4 MEV-aware</span></div>
+              <div class="detail-meta-row"><span>LPs</span><span>196 wallets</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-col-title">Deposit USDC</div>
+            <div class="deposit-panel">
+              <div class="deposit-field">
+                <div class="deposit-field-label"><span>Amount</span><span>Balance: 28 USDC</span></div>
+                <div class="deposit-field-row">
+                  <input class="deposit-input" type="number" placeholder="0"/>
+                  <span class="deposit-token">USDC</span>
+                </div>
+              </div>
+              <button class="deposit-btn">Deposit USDC →</button>
+              <div class="deposit-note">USDC only. Team seeds the DOGE side. No dual-token exposure.</div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-col-title">Score weight tiers</div>
+            <div class="score-boost-panel">
+              <div class="score-boost-row"><span>0–50 score</span><span>Base rate</span></div>
+              <div class="score-boost-row"><span>51–70 score</span><span>+8% boost</span></div>
+              <div class="score-boost-row"><span>71–80 score</span><span>+13% boost</span></div>
+              <div class="score-boost-row score-boost-you"><span>81–90 score (you)</span><span>+18% boost ✦</span></div>
+              <div class="score-boost-row"><span>91–100 score</span><span>+25% boost</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KEKE -->
+    <div class="vault-row-wrap">
+      <div class="vault-row" onclick="toggleVault(this)">
+        <div class="vault-token-cell">
+          <div class="vault-token-icon" style="background:rgba(168,85,247,0.1)">🐱</div>
+          <div>
+            <div class="vault-token-name">Keke vault</div>
+            <div class="vault-token-pair">KEKE / USDC · Base</div>
+          </div>
+        </div>
+        <div class="vault-status-cell"><span class="vstatus vs-new">★ New</span></div>
+        <div class="vault-cell">$88,000</div>
+        <div class="vault-cell green">34.1%</div>
+        <div class="vault-cell">11.2%</div>
+        <div class="vault-cell green">+18% ✦</div>
+        <div class="score-tier-cell"><span class="score-tier-pill tier-open">Open</span></div>
+        <div class="vault-chevron">▾</div>
+      </div>
+      <div class="vault-detail">
+        <div class="vault-detail-inner">
+          <div>
+            <div class="detail-col-title">Earning sources</div>
+            <div class="earn-sources">
+              <div class="earn-source"><div class="earn-source-left"><span class="earn-source-dot dot-fee"></span>Trading fees</div><div class="earn-source-val">20.9%</div></div>
+              <div class="earn-source"><div class="earn-source-left"><span class="earn-source-dot dot-mev"></span>MEV capture</div><div class="earn-source-val">11.2%</div></div>
+              <div class="earn-source"><div class="earn-source-left"><span class="earn-source-dot dot-ai"></span>AI range opt.</div><div class="earn-source-val">+2.0%</div></div>
+              <div class="earn-source"><div class="earn-source-left"><span class="earn-source-dot dot-score"></span>Score boost (82)</div><div class="earn-source-val">+18%</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-col-title">Vault details</div>
+            <div class="detail-meta">
+              <div class="detail-meta-row"><span>TVL</span><span>$88,000</span></div>
+              <div class="detail-meta-row"><span>Your deposit</span><span>—</span></div>
+              <div class="detail-meta-row"><span>Team seed</span><span>10M KEKE</span></div>
+              <div class="detail-meta-row"><span>Chain</span><span>Base</span></div>
+              <div class="detail-meta-row"><span>Hook</span><span>V4 MEV-aware</span></div>
+              <div class="detail-meta-row"><span>LPs</span><span>42 wallets</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-col-title">Deposit USDC</div>
+            <div class="deposit-panel">
+              <div class="deposit-field">
+                <div class="deposit-field-label"><span>Amount</span><span>Balance: 28 USDC</span></div>
+                <div class="deposit-field-row">
+                  <input class="deposit-input" type="number" placeholder="0"/>
+                  <span class="deposit-token">USDC</span>
+                </div>
+              </div>
+              <button class="deposit-btn">Deposit USDC →</button>
+              <div class="deposit-note">USDC only. Team seeds the KEKE side. No dual-token exposure.</div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-col-title">Score weight tiers</div>
+            <div class="score-boost-panel">
+              <div class="score-boost-row"><span>0–50 score</span><span>Base rate</span></div>
+              <div class="score-boost-row"><span>51–70 score</span><span>+8% boost</span></div>
+              <div class="score-boost-row"><span>71–80 score</span><span>+13% boost</span></div>
+              <div class="score-boost-row score-boost-you"><span>81–90 score (you)</span><span>+18% boost ✦</span></div>
+              <div class="score-boost-row"><span>91–100 score</span><span>+25% boost</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHIB -->
+    <div class="vault-row-wrap">
+      <div class="vault-row" onclick="toggleVault(this)">
+        <div class="vault-token-cell">
+          <div class="vault-token-icon" style="background:rgba(239,68,68,0.1)">🐶</div>
+          <div>
+            <div class="vault-token-name">Shib vault</div>
+            <div class="vault-token-pair">SHIB / USDC · Ethereum</div>
+          </div>
+        </div>
+        <div class="vault-status-cell"><span class="vstatus vs-active">● Active</span></div>
+        <div class="vault-cell">$194,000</div>
+        <div class="vault-cell green">19.4%</div>
+        <div class="vault-cell">5.8%</div>
+        <div class="vault-cell green">+18% ✦</div>
+        <div class="score-tier-cell"><span class="score-tier-pill tier-open">Open</span></div>
+        <div class="vault-chevron">▾</div>
+      </div>
+      <div class="vault-detail">
+        <div class="vault-detail-inner">
+          <div>
+            <div class="detail-col-title">Earning sources</div>
+            <div class="earn-sources">
+              <div class="earn-source"><div class="earn-source-left"><span class="earn-source-dot dot-fee"></span>Trading fees</div><div class="earn-source-val">11.6%</div></div>
+              <div class="earn-source"><div class="earn-source-left"><span class="earn-source-dot dot-mev"></span>MEV capture</div><div class="earn-source-val">5.8%</div></div>
+              <div class="earn-source"><div class="earn-source-left"><span class="earn-source-dot dot-ai"></span>AI range opt.</div><div class="earn-source-val">+2.0%</div></div>
+              <div class="earn-source"><div class="earn-source-left"><span class="earn-source-dot dot-score"></span>Score boost (82)</div><div class="earn-source-val">+18%</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-col-title">Vault details</div>
+            <div class="detail-meta">
+              <div class="detail-meta-row"><span>TVL</span><span>$194,000</span></div>
+              <div class="detail-meta-row"><span>Your deposit</span><span>—</span></div>
+              <div class="detail-meta-row"><span>Team seed</span><span>500B SHIB</span></div>
+              <div class="detail-meta-row"><span>Chain</span><span>Ethereum</span></div>
+              <div class="detail-meta-row"><span>Hook</span><span>V4 MEV-aware</span></div>
+              <div class="detail-meta-row"><span>LPs</span><span>138 wallets</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-col-title">Deposit USDC</div>
+            <div class="deposit-panel">
+              <div class="deposit-field">
+                <div class="deposit-field-label"><span>Amount</span><span>Balance: 28 USDC</span></div>
+                <div class="deposit-field-row">
+                  <input class="deposit-input" type="number" placeholder="0"/>
+                  <span class="deposit-token">USDC</span>
+                </div>
+              </div>
+              <button class="deposit-btn">Deposit USDC →</button>
+              <div class="deposit-note">USDC only. Team seeds the SHIB side. No dual-token exposure.</div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-col-title">Score weight tiers</div>
+            <div class="score-boost-panel">
+              <div class="score-boost-row"><span>0–50 score</span><span>Base rate</span></div>
+              <div class="score-boost-row"><span>51–70 score</span><span>+8% boost</span></div>
+              <div class="score-boost-row"><span>71–80 score</span><span>+13% boost</span></div>
+              <div class="score-boost-row score-boost-you"><span>81–90 score (you)</span><span>+18% boost ✦</span></div>
+              <div class="score-boost-row"><span>91–100 score</span><span>+25% boost</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BONK -->
+    <div class="vault-row-wrap">
+      <div class="vault-row" onclick="toggleVault(this)">
+        <div class="vault-token-cell">
+          <div class="vault-token-icon" style="background:rgba(249,115,22,0.1)">🦴</div>
+          <div>
+            <div class="vault-token-name">Bonk vault</div>
+            <div class="vault-token-pair">BONK / USDC · Sonic</div>
+          </div>
+        </div>
+        <div class="vault-status-cell"><span class="vstatus vs-new">★ New</span></div>
+        <div class="vault-cell">$44,000</div>
+        <div class="vault-cell green">41.8%</div>
+        <div class="vault-cell">14.4%</div>
+        <div class="vault-cell green">+18% ✦</div>
+        <div class="score-tier-cell"><span class="score-tier-pill tier-open">Open</span></div>
+        <div class="vault-chevron">▾</div>
+      </div>
+      <div class="vault-detail">
+        <div class="vault-detail-inner">
+          <div>
+            <div class="detail-col-title">Earning sources</div>
+            <div class="earn-sources">
+              <div class="earn-source"><div class="earn-source-left"><span class="earn-source-dot dot-fee"></span>Trading fees</div><div class="earn-source-val">25.4%</div></div>
+              <div class="earn-source"><div class="earn-source-left"><span class="earn-source-dot dot-mev"></span>MEV capture</div><div class="earn-source-val">14.4%</div></div>
+              <div class="earn-source"><div class="earn-source-left"><span class="earn-source-dot dot-ai"></span>AI range opt.</div><div class="earn-source-val">+2.0%</div></div>
+              <div class="earn-source"><div class="earn-source-left"><span class="earn-source-dot dot-score"></span>Score boost (82)</div><div class="earn-source-val">+18%</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-col-title">Vault details</div>
+            <div class="detail-meta">
+              <div class="detail-meta-row"><span>TVL</span><span>$44,000</span></div>
+              <div class="detail-meta-row"><span>Your deposit</span><span>—</span></div>
+              <div class="detail-meta-row"><span>Team seed</span><span>50M BONK</span></div>
+              <div class="detail-meta-row"><span>Chain</span><span>Sonic</span></div>
+              <div class="detail-meta-row"><span>Hook</span><span>V4 MEV-aware</span></div>
+              <div class="detail-meta-row"><span>LPs</span><span>28 wallets</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-col-title">Deposit USDC</div>
+            <div class="deposit-panel">
+              <div class="deposit-field">
+                <div class="deposit-field-label"><span>Amount</span><span>Balance: 28 USDC</span></div>
+                <div class="deposit-field-row">
+                  <input class="deposit-input" type="number" placeholder="0"/>
+                  <span class="deposit-token">USDC</span>
+                </div>
+              </div>
+              <button class="deposit-btn">Deposit USDC →</button>
+              <div class="deposit-note">USDC only. Team seeds the BONK side. No dual-token exposure.</div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-col-title">Score weight tiers</div>
+            <div class="score-boost-panel">
+              <div class="score-boost-row"><span>0–50 score</span><span>Base rate</span></div>
+              <div class="score-boost-row"><span>51–70 score</span><span>+8% boost</span></div>
+              <div class="score-boost-row"><span>71–80 score</span><span>+13% boost</span></div>
+              <div class="score-boost-row score-boost-you"><span>81–90 score (you)</span><span>+18% boost ✦</span></div>
+              <div class="score-boost-row"><span>91–100 score</span><span>+25% boost</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function toggleVault(rowEl){
+  const wrap=rowEl.closest('.vault-row-wrap');
+  const detail=wrap.querySelector('.vault-detail');
+  const chevron=rowEl.querySelector('.vault-chevron');
+  const isOpen=detail.classList.contains('open');
+  document.querySelectorAll('.vault-detail.open').forEach(d=>d.classList.remove('open'));
+  document.querySelectorAll('.vault-chevron.open').forEach(c=>c.classList.remove('open'));
+  document.querySelectorAll('.vault-row.expanded').forEach(r=>r.classList.remove('expanded'));
+  if(!isOpen){detail.classList.add('open');chevron.classList.add('open');rowEl.classList.add('expanded')}
+}
+function setBF(el){
+  el.closest('.browse-filter-group').querySelectorAll('.browse-filter').forEach(f=>f.classList.remove('active'));
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>

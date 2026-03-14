@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mintware — App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#0052FF;--blue-dim:rgba(0,82,255,0.07);--blue-mid:rgba(0,82,255,0.14);
+  --ink:#1A1A2E;--ink-2:#3A3C52;--ink-3:#8A8C9E;
+  --surface:#F7F6FF;--white:#ffffff;
+  --green:#16a34a;--green-bg:#f0fdf4;--green-border:#bbf7d0;
+  --border:rgba(26,26,46,0.08);--border-strong:rgba(26,26,46,0.13);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--surface);color:var(--ink);min-height:100vh}
+
+/* NAV */
+.app-nav{
+  background:rgba(255,255,255,0.94);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+  padding:0 28px;display:flex;align-items:center;
+  position:sticky;top:0;z-index:100;height:56px;gap:16px;
+}
+.app-logo{
+  font-family:Georgia,serif;font-size:18px;font-weight:700;
+  color:var(--ink);display:flex;align-items:center;gap:8px;flex-shrink:0;
+}
+.app-logo-mark{
+  width:22px;height:22px;border-radius:5px;background:var(--blue);
+  display:flex;align-items:center;justify-content:center;
+}
+.app-logo-mark svg{width:12px;height:12px;fill:white}
+
+/* WALLET SEARCH BAR */
+.wallet-search{
+  flex:1;max-width:420px;position:relative;
+}
+.wallet-search input{
+  width:100%;padding:8px 14px 8px 36px;
+  border:1.5px solid var(--border-strong);border-radius:20px;
+  font-size:12px;font-family:'DM Mono',monospace;color:var(--ink);
+  background:var(--surface);outline:none;transition:all 0.15s;
+}
+.wallet-search input:focus{border-color:var(--blue);background:var(--white)}
+.wallet-search input::placeholder{color:var(--ink-3);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px}
+.wallet-search-icon{
+  position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  font-size:13px;pointer-events:none;opacity:0.4;
+}
+
+.app-nav-tabs{display:flex;align-items:stretch;gap:0;margin-left:8px}
+.app-tab{
+  padding:0 16px;font-size:13px;font-weight:500;color:var(--ink-3);
+  cursor:pointer;border-bottom:2px solid transparent;
+  display:flex;align-items:center;height:56px;
+  transition:all 0.15s;white-space:nowrap;
+}
+.app-tab:hover{color:var(--ink)}
+.app-tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+
+.app-nav-right{margin-left:auto;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.connect-btn{
+  background:var(--blue);color:#fff;border:none;
+  padding:8px 18px;border-radius:20px;font-size:12px;font-weight:600;
+  cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:background 0.15s;
+}
+.connect-btn:hover{background:#0040cc}
+.connected-pill{
+  display:flex;align-items:center;gap:6px;
+  background:var(--surface);border:1px solid var(--border-strong);
+  border-radius:20px;padding:6px 12px;font-size:11px;font-weight:600;
+  color:var(--ink-2);font-family:'DM Mono',monospace;cursor:pointer;
+  transition:all 0.15s;
+}
+.connected-pill:hover{border-color:var(--blue);color:var(--blue)}
+.connected-dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+
+/* PAGES */
+.page{display:none}
+.page.active{display:block}
+
+/* ══════════════════════════════
+   PORTFOLIO PAGE
+══════════════════════════════ */
+.profile-wrap{background:var(--white);min-height:calc(100vh - 56px)}
+.p-header{padding:24px 28px 0;border-bottom:1px solid var(--border)}
+.p-identity{display:flex;align-items:flex-start;gap:20px;padding-bottom:16px}
+.p-avatar{
+  width:80px;height:80px;border-radius:16px;background:var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  font-size:34px;flex-shrink:0;position:relative;border:2px solid var(--border);
+}
+.p-score-badge{
+  position:absolute;bottom:0;right:0;background:var(--blue);color:#fff;
+  font-family:'DM Mono',monospace;font-size:10px;font-weight:500;
+  padding:3px 6px;border-radius:6px 0 0 0;
+}
+.p-info{flex:1;padding-top:2px}
+.p-name{
+  font-size:21px;font-weight:700;color:var(--ink);letter-spacing:-0.5px;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:Georgia,serif;
+}
+.p-name-badge{
+  font-size:10px;font-weight:600;background:var(--blue-dim);color:var(--blue);
+  padding:3px 8px;border-radius:20px;letter-spacing:0.3px;
+  font-family:'Plus Jakarta Sans',sans-serif;
+}
+.p-addr{
+  font-family:'DM Mono',monospace;font-size:11px;color:#aaa;
+  margin:4px 0 10px;display:flex;align-items:center;gap:6px;
+}
+.p-addr-copy{
+  background:var(--surface);border-radius:3px;padding:1px 5px;
+  font-size:10px;cursor:pointer;color:var(--ink-3);
+}
+.p-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.p-meta-pill{
+  background:var(--surface);border-radius:6px;padding:3px 9px;
+  font-size:11px;color:var(--ink-2);
+}
+.p-value-block{text-align:right;min-width:170px;padding-top:2px}
+.p-value-num{
+  font-size:26px;font-weight:700;color:var(--ink);
+  letter-spacing:-1px;font-family:Georgia,serif;
+}
+.p-value-change{font-size:12px;font-weight:600;color:#dc2626;margin-top:2px}
+
+.p-stats{
+  display:flex;align-items:stretch;border-top:1px solid var(--border);
+  overflow-x:auto;
+}
+.p-stat{
+  display:flex;flex-direction:column;gap:2px;padding:12px 16px;
+  border-right:1px solid var(--border);flex-shrink:0;
+}
+.p-stat-label{font-size:11px;color:#bbb;white-space:nowrap}
+.p-stat-val{font-size:14px;font-weight:600;color:var(--ink);white-space:nowrap}
+.p-stat-earnings{
+  background:var(--green-bg);border-right:1px solid var(--border);
+  padding:12px 18px;display:flex;flex-direction:column;gap:2px;
+  flex-shrink:0;border-top:2px solid var(--green);
+}
+.p-stat-earnings .p-stat-label{color:var(--green)}
+.p-stat-earnings .p-stat-val{font-size:17px;color:#14532d;font-family:'DM Mono',monospace;font-weight:600}
+.p-stat-earnings .p-stat-sub{font-size:10px;color:var(--green);margin-top:1px}
+.p-score-stat{
+  background:var(--blue-dim);border-top:2px solid var(--blue);
+  padding:12px 16px;display:flex;flex-direction:column;gap:2px;
+  flex-shrink:0;border-right:1px solid var(--border);
+}
+.p-score-stat .p-stat-label{color:#6b9fff}
+.p-score-stat .p-stat-val{color:var(--blue);font-size:15px;font-family:'DM Mono',monospace}
+.p-follow-btn{
+  background:var(--blue);color:#fff;border:none;padding:8px 22px;
+  border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;
+  margin:auto 16px auto auto;flex-shrink:0;font-family:'Plus Jakarta Sans',sans-serif;
+}
+.p-follow-btn:hover{background:#0040cc}
+
+.p-sub-tabs{display:flex;border-bottom:1px solid var(--border);margin:0 28px}
+.p-sub-tab{
+  padding:12px 20px;font-size:14px;font-weight:500;color:#aaa;
+  cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s;
+}
+.p-sub-tab:hover{color:var(--ink)}
+.p-sub-tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+
+.p-body{padding:20px 28px}
+
+/* earnings panel */
+.earnings-panel{
+  border:1px solid var(--green-border);border-radius:12px;
+  background:var(--green-bg);padding:16px 18px;margin-bottom:18px;
+}
+.earnings-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.earnings-title{font-size:11px;font-weight:600;color:var(--green);letter-spacing:1px;text-transform:uppercase}
+.earnings-total{font-size:28px;font-weight:700;color:#14532d;font-family:'DM Mono',monospace;letter-spacing:-1px}
+.earnings-period{font-size:11px;color:var(--green);margin-top:2px}
+.earnings-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.earning-type{background:var(--white);border:1px solid var(--green-border);border-radius:8px;padding:12px 14px}
+.earning-type-label{font-size:11px;color:#aaa;margin-bottom:4px}
+.earning-type-val{font-size:15px;font-weight:700;color:var(--ink);font-family:'DM Mono',monospace}
+.earning-type-sub{font-size:10px;color:#bbb;margin-top:2px}
+.earning-bar{height:3px;background:var(--green-border);border-radius:2px;overflow:hidden;margin-top:8px}
+.earning-bar-fill{height:100%;background:var(--green);border-radius:2px}
+
+/* score panel */
+.score-panel{
+  border:1px solid #d0deff;border-radius:12px;
+  background:#f7f9ff;padding:16px 18px;margin-bottom:18px;
+}
+.score-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.score-panel-title{font-size:11px;font-weight:600;color:var(--blue);letter-spacing:1px;text-transform:uppercase}
+.score-tier-pill{font-size:11px;color:#fff;background:var(--blue);padding:3px 10px;border-radius:20px;font-weight:600}
+.score-big{font-size:38px;font-weight:700;color:var(--blue);font-family:'DM Mono',monospace;letter-spacing:-1px;line-height:1}
+.score-dims{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.score-dim{display:flex;flex-direction:column;gap:4px}
+.score-dim-row{display:flex;justify-content:space-between}
+.score-dim-name{font-size:11px;color:#888}
+.score-dim-num{font-size:11px;font-weight:600;color:var(--blue);font-family:'DM Mono',monospace}
+.score-dim-bar{height:3px;background:#dce8ff;border-radius:2px;overflow:hidden}
+.score-dim-fill{height:100%;background:var(--blue);border-radius:2px}
+
+/* chains */
+.chains-grid{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:0;
+  margin-bottom:16px;border:1px solid var(--border);border-radius:12px;overflow:hidden;
+}
+.chain{
+  display:flex;align-items:center;gap:8px;padding:12px;
+  border-right:1px solid var(--border);cursor:pointer;transition:background 0.1s;
+}
+.chain:hover{background:var(--surface)}
+.chain:last-child{border-right:none}
+.chain-dot{
+  width:26px;height:26px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;flex-shrink:0;font-weight:700;
+}
+.chain-name{font-size:12px;font-weight:600;color:var(--ink)}
+.chain-val{font-size:11px;color:#aaa}
+
+/* protocols */
+.protocols-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.proto-card{
+  border:1px solid var(--border);border-radius:10px;padding:12px 14px;
+  display:flex;align-items:center;gap:10px;cursor:pointer;transition:all 0.15s;
+}
+.proto-card:hover{border-color:var(--blue);background:#f9fbff}
+.proto-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.proto-name{font-size:12px;font-weight:500;color:#888}
+.proto-val{font-size:14px;font-weight:700;color:var(--ink)}
+
+/* table */
+.asset-table{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-top:8px}
+.asset-table-header{
+  display:grid;grid-template-columns:2fr 1fr 1fr 1fr;
+  background:var(--surface);border-bottom:1px solid var(--border);
+}
+.asset-table-header div{padding:9px 14px;font-size:11px;font-weight:600;color:#bbb}
+.asset-table-header div:not(:first-child){text-align:right}
+.asset-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;border-top:1px solid var(--border)}
+.asset-row div{padding:10px 14px;font-size:13px;color:#666}
+.asset-row div:first-child{display:flex;align-items:center;gap:8px;font-weight:500;color:var(--ink)}
+.asset-row div:not(:first-child){text-align:right}
+.asset-row div:last-child{font-weight:600;color:var(--ink)}
+.tok-icon{
+  width:22px;height:22px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;
+}
+.section-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 0;border-top:1px solid var(--border);margin-bottom:8px;margin-top:4px;
+}
+.section-row-label{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
+.section-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px}
+
+/* ══════════════════════════════
+   LEADERBOARD PAGE
+══════════════════════════════ */
+.lb-wrap{padding:24px 28px;max-width:900px;margin:0 auto}
+.lb-title{font-family:Georgia,serif;font-size:26px;font-weight:700;color:var(--ink);letter-spacing:-0.5px;margin-bottom:4px}
+.lb-sub{font-size:13px;color:#aaa;margin-bottom:20px}
+.lb-sub-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:0}
+.lb-sub-tab{
+  padding:10px 18px;font-size:13px;font-weight:500;color:#aaa;
+  cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s;
+}
+.lb-sub-tab:hover{color:var(--ink)}
+.lb-sub-tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+.lb-filters{display:flex;align-items:center;gap:8px;padding:14px 0;flex-wrap:wrap}
+.lb-filter{
+  padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;
+  cursor:pointer;border:1px solid var(--border);color:#888;background:var(--white);transition:all 0.15s;
+}
+.lb-filter:hover{border-color:var(--blue);color:var(--blue)}
+.lb-filter.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.lb-filter-label{font-size:12px;color:#ccc;margin-right:4px}
+.lb-your-rank{
+  background:var(--blue-dim);border:1px solid #d0deff;border-radius:10px;
+  padding:12px 16px;margin:16px 0 4px;display:flex;align-items:center;gap:16px;
+}
+.lb-yr-label{font-size:11px;color:#6b9fff;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.lb-yr-rank{font-size:24px;font-weight:700;color:var(--blue);font-family:'DM Mono',monospace}
+.lb-yr-sub{font-size:11px;color:#aaa;margin-top:1px}
+.lb-podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:20px 0;align-items:end}
+.lb-pod{border-radius:12px;padding:16px;text-align:center;cursor:pointer;transition:all 0.15s;border:1px solid var(--border)}
+.lb-pod:hover{transform:translateY(-2px)}
+.lb-pod-1{background:#fffbf0;border-color:#fde68a;order:2}
+.lb-pod-2{background:#f8f8f8;border-color:#e5e5e5;order:1}
+.lb-pod-3{background:#fff8f5;border-color:#fed7aa;order:3}
+.lb-pod-rank{font-size:20px;margin-bottom:6px}
+.lb-pod-avatar{width:44px;height:44px;border-radius:12px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.lb-pod-name{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:2px}
+.lb-pod-handle{font-size:10px;color:var(--blue);font-family:'DM Mono',monospace;margin-bottom:8px}
+.lb-pod-score{font-size:22px;font-weight:700;font-family:'DM Mono',monospace;color:var(--ink)}
+.lb-pod-earnings{font-size:11px;color:var(--green);font-weight:600;margin-top:6px;background:var(--green-bg);padding:3px 8px;border-radius:20px;display:inline-block}
+.lb-table-header{
+  display:grid;grid-template-columns:44px 1fr 80px 100px 90px 80px;
+  padding:10px 0 6px;border-bottom:1px solid var(--border);
+}
+.lb-table-header div{font-size:11px;font-weight:600;color:#bbb;text-align:right}
+.lb-table-header div:first-child{text-align:center}
+.lb-table-header div:nth-child(2){text-align:left}
+.lb-row{
+  display:grid;grid-template-columns:44px 1fr 80px 100px 90px 80px;
+  align-items:center;padding:10px 0;border-bottom:1px solid #f5f5f0;
+  cursor:pointer;transition:background 0.1s;
+}
+.lb-row:hover{background:var(--surface);margin:0 -28px;padding:10px 28px}
+.lb-row.my-row{background:var(--blue-dim);margin:0 -28px;padding:10px 28px;border-left:2px solid var(--blue)}
+.lb-col-rank{font-size:13px;font-weight:700;color:#aaa;font-family:'DM Mono',monospace;text-align:center}
+.lb-col-rank.top{color:var(--ink)}
+.lb-col-identity{display:flex;align-items:center;gap:10px}
+.lb-row-avatar{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.lb-row-name{font-size:13px;font-weight:600;color:var(--ink)}
+.lb-row-handle{font-size:10px;color:var(--blue);font-family:'DM Mono',monospace}
+.lb-col-score{font-size:14px;font-weight:700;color:var(--blue);font-family:'DM Mono',monospace;text-align:right}
+.lb-col-earnings{font-size:13px;font-weight:600;color:var(--green);text-align:right}
+.lb-col-refs{font-size:13px;color:#666;text-align:right}
+.lb-col-change{font-size:12px;font-weight:600;text-align:right}
+.up{color:var(--green)}.down{color:#dc2626}.flat{color:#aaa}
+.lb-gap{padding:10px 0;text-align:center;font-size:12px;color:#ccc;border-bottom:1px solid #f5f5f0;letter-spacing:2px}
+
+/* ══════════════════════════════
+   REFERRALS PAGE
+══════════════════════════════ */
+.ref-wrap{padding:24px 28px;max-width:900px;margin:0 auto}
+.ref-title{font-family:Georgia,serif;font-size:26px;font-weight:700;color:var(--ink);letter-spacing:-0.5px;margin-bottom:4px}
+.ref-sub{font-size:13px;color:#aaa;margin-bottom:24px}
+.ref-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.ref-stat-card{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:12px;padding:16px 18px;
+}
+.ref-stat-label{font-size:11px;color:#aaa;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
+.ref-stat-val{font-size:22px;font-weight:700;color:var(--ink);font-family:'DM Mono',monospace;letter-spacing:-0.5px}
+.ref-stat-sub{font-size:11px;color:#bbb;margin-top:3px}
+.ref-earn-card{background:var(--green-bg);border-color:var(--green-border)}
+.ref-earn-card .ref-stat-label{color:var(--green)}
+.ref-earn-card .ref-stat-val{color:#14532d}
+
+.ref-link-box{
+  background:var(--surface);border:1px solid var(--border-strong);
+  border-radius:12px;padding:18px 20px;margin-bottom:24px;
+  display:flex;align-items:center;gap:14px;
+}
+.ref-link-left{flex:1}
+.ref-link-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.ref-link-url{
+  font-family:'DM Mono',monospace;font-size:11px;color:var(--blue);
+  background:var(--blue-dim);padding:6px 12px;border-radius:6px;
+  display:inline-block;margin-top:6px;
+}
+.ref-copy-btn{
+  background:var(--ink);color:#fff;border:none;padding:10px 20px;
+  border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif;flex-shrink:0;transition:background 0.15s;
+}
+.ref-copy-btn:hover{background:var(--blue)}
+
+.ref-table-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:12px}
+.ref-table{border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.ref-table-header{
+  display:grid;grid-template-columns:1fr 80px 100px 80px 80px;
+  background:var(--surface);border-bottom:1px solid var(--border);
+}
+.ref-table-header div{padding:10px 14px;font-size:11px;font-weight:600;color:#bbb}
+.ref-table-header div:not(:first-child){text-align:right}
+.ref-row{
+  display:grid;grid-template-columns:1fr 80px 100px 80px 80px;
+  border-top:1px solid var(--border);align-items:center;
+  cursor:pointer;transition:background 0.1s;
+}
+.ref-row:hover{background:var(--surface)}
+.ref-row div{padding:10px 14px;font-size:13px;color:#666}
+.ref-row div:first-child{display:flex;align-items:center;gap:10px;color:var(--ink);font-weight:500}
+.ref-row div:not(:first-child){text-align:right}
+.ref-row-avatar{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.ref-row-handle{font-size:10px;color:var(--blue);font-family:'DM Mono',monospace;margin-top:1px}
+.ref-score-pill{
+  display:inline-block;padding:2px 8px;border-radius:10px;
+  font-size:11px;font-weight:700;font-family:'DM Mono',monospace;
+}
+.score-high{background:var(--blue-dim);color:var(--blue)}
+.score-mid{background:rgba(26,26,46,0.06);color:var(--ink-3)}
+
+/* ══════════════════════════════
+   SWAP PAGE
+══════════════════════════════ */
+.swap-wrap{
+  padding:40px 28px;display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-start;min-height:calc(100vh - 56px);
+}
+.swap-card{
+  background:var(--white);border:1px solid var(--border-strong);
+  border-radius:20px;width:100%;max-width:440px;
+  padding:24px;box-shadow:0 4px 24px rgba(26,26,46,0.06);
+}
+.swap-title{font-family:Georgia,serif;font-size:20px;font-weight:700;color:var(--ink);margin-bottom:4px;letter-spacing:-0.3px}
+.swap-sub{font-size:12px;color:#aaa;margin-bottom:20px}
+.swap-field{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:14px;padding:16px;margin-bottom:8px;transition:border-color 0.15s;
+}
+.swap-field:focus-within{border-color:var(--blue)}
+.swap-field-label{font-size:11px;color:#aaa;margin-bottom:8px;display:flex;justify-content:space-between}
+.swap-field-label span:last-child{color:var(--blue);cursor:pointer}
+.swap-field-row{display:flex;align-items:center;gap:10px}
+.swap-amount{
+  flex:1;font-size:24px;font-weight:700;color:var(--ink);
+  background:none;border:none;outline:none;
+  font-family:Georgia,serif;letter-spacing:-0.5px;
+}
+.swap-amount::placeholder{color:#ddd}
+.swap-token-btn{
+  display:flex;align-items:center;gap:6px;
+  background:var(--white);border:1px solid var(--border-strong);
+  border-radius:20px;padding:6px 12px;cursor:pointer;
+  font-size:13px;font-weight:700;color:var(--ink);transition:all 0.15s;flex-shrink:0;
+}
+.swap-token-btn:hover{border-color:var(--blue);color:var(--blue)}
+.swap-usd{font-size:12px;color:#aaa;margin-top:6px;font-family:'DM Mono',monospace}
+.swap-flip{
+  display:flex;justify-content:center;margin:4px 0;
+}
+.swap-flip-btn{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--white);border:1.5px solid var(--border-strong);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:16px;transition:all 0.15s;
+}
+.swap-flip-btn:hover{border-color:var(--blue);color:var(--blue);transform:rotate(180deg)}
+.swap-details{
+  background:var(--surface);border-radius:10px;padding:12px 14px;
+  margin:14px 0;display:flex;flex-direction:column;gap:8px;
+}
+.swap-detail-row{display:flex;justify-content:space-between;font-size:12px}
+.swap-detail-row span:first-child{color:#aaa}
+.swap-detail-row span:last-child{color:var(--ink);font-weight:500;font-family:'DM Mono',monospace}
+.swap-btn{
+  width:100%;padding:16px;border-radius:14px;
+  background:var(--blue);color:#fff;border:none;
+  font-size:16px;font-weight:700;cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif;transition:background 0.15s;
+}
+.swap-btn:hover{background:#0040cc}
+.swap-attr-note{
+  margin-top:14px;padding:10px 14px;
+  background:var(--green-bg);border:1px solid var(--green-border);
+  border-radius:10px;font-size:12px;color:#14532d;
+  display:flex;align-items:center;gap:8px;
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="app-nav">
+  <div class="app-logo">
+    <div class="app-logo-mark"><svg viewBox="0 0 14 14"><path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5Z"/></svg></div>
+    Mintware
+  </div>
+
+  <div class="wallet-search">
+    <span class="wallet-search-icon">⌕</span>
+    <input type="text" placeholder="Paste any wallet address or ENS to explore..." id="wallet-input" oninput="handleWalletInput(this.value)"/>
+  </div>
+
+  <div class="app-nav-tabs">
+    <div class="app-tab active" onclick="showPage('portfolio',this)">Portfolio</div>
+    <div class="app-tab" onclick="showPage('leaderboard',this)">Leaderboard</div>
+    <div class="app-tab" onclick="showPage('referrals',this)">Referrals</div>
+    <div class="app-tab" onclick="showPage('swap',this)">Swap</div>
+  </div>
+
+  <div class="app-nav-right">
+    <div class="connected-pill">
+      <span class="connected-dot"></span>
+      0xf7b1…e2d6
+    </div>
+  </div>
+</nav>
+
+<!-- ══ PORTFOLIO PAGE ══ -->
+<div class="page active" id="page-portfolio">
+  <div class="profile-wrap">
+    <div class="p-header">
+      <div class="p-identity">
+        <div class="p-avatar">🧙<div class="p-score-badge">82</div></div>
+        <div class="p-info">
+          <div class="p-name">nmstarchild <span class="p-name-badge">vaultking.mintware</span></div>
+          <div class="p-addr">0xf7b1…e2d6 <span class="p-addr-copy">copy</span></div>
+          <div class="p-meta">
+            <span class="p-meta-pill">🏆 30</span>
+            <span class="p-meta-pill">📅 3045 days</span>
+            <span class="p-meta-pill">🔗 23 referrals</span>
+            <span class="p-meta-pill" style="background:var(--blue-dim);color:var(--blue)">Builder tier</span>
+          </div>
+        </div>
+        <div class="p-value-block">
+          <div class="p-value-num">$52,319</div>
+          <div class="p-value-change">▼ 2.26%</div>
+          <svg style="margin-top:6px;opacity:0.5" width="120" height="28" viewBox="0 0 120 28">
+            <polyline points="0,22 10,18 20,20 30,12 40,14 50,8 60,12 70,6 80,10 90,5 100,9 110,7 120,10" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      <div class="p-stats">
+        <div class="p-stat-earnings">
+          <span class="p-stat-label">Total earnings</span>
+          <span class="p-stat-val">$2,760.24</span>
+          <span class="p-stat-sub">+$184 this month</span>
+        </div>
+        <div class="p-stat"><span class="p-stat-label">TVF</span><span class="p-stat-val">$380.3M</span></div>
+        <div class="p-stat"><span class="p-stat-label">Followers</span><span class="p-stat-val">14.6K</span></div>
+        <div class="p-stat"><span class="p-stat-label">Following</span><span class="p-stat-val">763</span></div>
+        <div class="p-stat"><span class="p-stat-label">On-chain PnL</span><span class="p-stat-val" style="color:var(--green)">+$41.2K</span></div>
+        <div class="p-stat"><span class="p-stat-label">LP positions</span><span class="p-stat-val">14</span></div>
+        <div class="p-score-stat"><span class="p-stat-label">Attribution score</span><span class="p-stat-val">82 / 100</span></div>
+        <button class="p-follow-btn">+ Follow</button>
+      </div>
+    </div>
+
+    <div class="p-sub-tabs">
+      <div class="p-sub-tab active" onclick="setSubTab(this)">Portfolio</div>
+      <div class="p-sub-tab" onclick="setSubTab(this)">Transactions</div>
+      <div class="p-sub-tab" onclick="setSubTab(this)">Score</div>
+      <div class="p-sub-tab" onclick="setSubTab(this)">Badge</div>
+    </div>
+
+    <div class="p-body">
+
+      <!-- EARNINGS -->
+      <div class="earnings-panel">
+        <div class="earnings-header">
+          <div>
+            <div class="earnings-title">Attribution earnings</div>
+            <div class="earnings-total">$2,760.24</div>
+            <div class="earnings-period">All time · updated 12 mins ago</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:11px;color:var(--green);margin-bottom:4px">This month</div>
+            <div style="font-size:20px;font-weight:700;color:#14532d;font-family:'DM Mono',monospace">+$184.50</div>
+            <div style="font-size:10px;color:var(--green);margin-top:2px">score weight: 82/100</div>
+          </div>
+        </div>
+        <div class="earnings-grid">
+          <div class="earning-type">
+            <div class="earning-type-label">Vault fees</div>
+            <div class="earning-type-val">$1,842.10</div>
+            <div class="earning-type-sub">From LP positions</div>
+            <div class="earning-bar"><div class="earning-bar-fill" style="width:67%"></div></div>
+          </div>
+          <div class="earning-type">
+            <div class="earning-type-label">Referral rewards</div>
+            <div class="earning-type-val">$714.88</div>
+            <div class="earning-type-sub">23 wallets referred</div>
+            <div class="earning-bar"><div class="earning-bar-fill" style="width:26%"></div></div>
+          </div>
+          <div class="earning-type">
+            <div class="earning-type-label">Reward pools</div>
+            <div class="earning-type-val">$203.26</div>
+            <div class="earning-type-sub">4 token distributions</div>
+            <div class="earning-bar"><div class="earning-bar-fill" style="width:7%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCORE -->
+      <div class="score-panel">
+        <div class="score-panel-header">
+          <span class="score-panel-title">Attribution score</span>
+          <span class="score-tier-pill">Builder tier</span>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:20px">
+          <div>
+            <div class="score-big">82</div>
+            <div style="font-size:11px;color:#aaa;margin-top:4px;font-family:'DM Mono',monospace">top 5%</div>
+          </div>
+          <div style="flex:1">
+            <div class="score-dims">
+              <div class="score-dim"><div class="score-dim-row"><span class="score-dim-name">LP behavior</span><span class="score-dim-num">91</span></div><div class="score-dim-bar"><div class="score-dim-fill" style="width:91%"></div></div></div>
+              <div class="score-dim"><div class="score-dim-row"><span class="score-dim-name">DeFi competence</span><span class="score-dim-num">85</span></div><div class="score-dim-bar"><div class="score-dim-fill" style="width:85%"></div></div></div>
+              <div class="score-dim"><div class="score-dim-row"><span class="score-dim-name">Wallet longevity</span><span class="score-dim-num">78</span></div><div class="score-dim-bar"><div class="score-dim-fill" style="width:78%"></div></div></div>
+              <div class="score-dim"><div class="score-dim-row"><span class="score-dim-name">Network & referral</span><span class="score-dim-num">64</span></div><div class="score-dim-bar"><div class="score-dim-fill" style="width:64%"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHAINS -->
+      <div class="chains-grid">
+        <div class="chain"><div class="chain-dot" style="background:#e8f0ff;color:var(--blue)">B</div><div><div class="chain-name">Base</div><div class="chain-val">$34,737 · 66%</div></div></div>
+        <div class="chain"><div class="chain-dot" style="background:#fff4e8;color:#f97316">S</div><div><div class="chain-name">Sonic</div><div class="chain-val">$11,945 · 23%</div></div></div>
+        <div class="chain"><div class="chain-dot" style="background:#eef2ff;color:#6366f1">Ξ</div><div><div class="chain-name">Ethereum</div><div class="chain-val">$2,456 · 5%</div></div></div>
+        <div class="chain"><div class="chain-dot" style="background:#f0fdf4;color:var(--green)">A</div><div><div class="chain-name">Arbitrum</div><div class="chain-val">$1,044 · 2%</div></div></div>
+        <div class="chain"><div class="chain-dot" style="background:#fdf4ff;color:#a855f7">O</div><div><div class="chain-name">OP</div><div class="chain-val">$933 · 2%</div></div></div>
+      </div>
+
+      <!-- PROTOCOLS -->
+      <div class="protocols-row">
+        <div class="proto-card"><div class="proto-icon" style="background:#fff0f6">🦄</div><div><div class="proto-name">Uniswap V4</div><div class="proto-val">$23,183</div></div></div>
+        <div class="proto-card"><div class="proto-icon" style="background:#f0f4ff">🥞</div><div><div class="proto-name">PancakeSwap V3</div><div class="proto-val">$10,842</div></div></div>
+        <div class="proto-card"><div class="proto-icon" style="background:#f0fdf4;color:var(--green);font-weight:700;font-size:13px">A</div><div><div class="proto-name">Aave V3</div><div class="proto-val">$602</div></div></div>
+      </div>
+
+      <div class="section-row">
+        <div class="section-row-label"><div class="section-icon" style="background:#ffe8f0">👛</div>Wallet</div>
+        <div style="font-size:13px;font-weight:600">$602</div>
+      </div>
+      <div class="asset-table">
+        <div class="asset-table-header"><div>Token</div><div>Price</div><div>Amount</div><div>USD Value</div></div>
+        <div class="asset-row"><div><span class="tok-icon" style="background:#eef2ff;color:#6366f1">Ξ</span>ETH</div><div>$1,978</div><div>0.29</div><div>$574</div></div>
+        <div class="asset-row"><div><span class="tok-icon" style="background:var(--blue-dim);color:var(--blue);font-size:9px">U</span>USDC</div><div>$1.00</div><div>28</div><div>$28</div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ LEADERBOARD PAGE ══ -->
+<div class="page" id="page-leaderboard">
+  <div class="lb-wrap">
+    <div class="lb-title">Leaderboard</div>
+    <div class="lb-sub">Updated every 10 minutes · 24,817 wallets scored</div>
+    <div class="lb-sub-tabs">
+      <div class="lb-sub-tab active" onclick="setLbTab(this)">Top score</div>
+      <div class="lb-sub-tab" onclick="setLbTab(this)">Top earners</div>
+      <div class="lb-sub-tab" onclick="setLbTab(this)">Top referrers</div>
+      <div class="lb-sub-tab" onclick="setLbTab(this)">Rising fast</div>
+    </div>
+    <div class="lb-filters">
+      <span class="lb-filter-label">Chain</span>
+      <div class="lb-filter active" onclick="setLbFilter(this)">All chains</div>
+      <div class="lb-filter" onclick="setLbFilter(this)">Base</div>
+      <div class="lb-filter" onclick="setLbFilter(this)">Ethereum</div>
+      <div class="lb-filter" onclick="setLbFilter(this)">Arbitrum</div>
+      <div class="lb-filter" onclick="setLbFilter(this)">Sonic</div>
+    </div>
+    <div class="lb-your-rank">
+      <div>
+        <div class="lb-yr-label">Your rank</div>
+        <div class="lb-yr-rank">#847</div>
+        <div class="lb-yr-sub">Top 3.4% · up 12 spots this week</div>
+      </div>
+      <div style="flex:1;padding:0 20px">
+        <div style="height:4px;background:#dce8ff;border-radius:2px;overflow:hidden">
+          <div style="width:96.6%;height:100%;background:var(--blue);border-radius:2px"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px">
+          <span style="font-size:10px;color:#aaa">#1</span>
+          <span style="font-size:10px;color:var(--blue);font-weight:600">#847 (you)</span>
+          <span style="font-size:10px;color:#aaa">#24,817</span>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;color:#6b9fff;font-weight:600">Score</div>
+        <div style="font-size:20px;font-weight:700;color:var(--blue);font-family:'DM Mono',monospace">82</div>
+      </div>
+    </div>
+    <div class="lb-podium">
+      <div class="lb-pod lb-pod-2">
+        <div class="lb-pod-rank">🥈</div>
+        <div class="lb-pod-avatar" style="background:#f0f0ec">🦊</div>
+        <div class="lb-pod-name">defi_fox</div>
+        <div class="lb-pod-handle">foxvault.mintware</div>
+        <div class="lb-pod-score">97</div>
+        <div class="lb-pod-earnings">$8,420 earned</div>
+      </div>
+      <div class="lb-pod lb-pod-1">
+        <div class="lb-pod-rank">🥇</div>
+        <div class="lb-pod-avatar" style="background:#fff0e8">🐉</div>
+        <div class="lb-pod-name">0xdragon</div>
+        <div class="lb-pod-handle">dragon.mintware</div>
+        <div class="lb-pod-score">99</div>
+        <div class="lb-pod-earnings">$14,220 earned</div>
+      </div>
+      <div class="lb-pod lb-pod-3">
+        <div class="lb-pod-rank">🥉</div>
+        <div class="lb-pod-avatar" style="background:#f0f8ff">🤖</div>
+        <div class="lb-pod-name">lpmaxi</div>
+        <div class="lb-pod-handle">lpmaxi.mintware</div>
+        <div class="lb-pod-score">96</div>
+        <div class="lb-pod-earnings">$7,180 earned</div>
+      </div>
+    </div>
+    <div class="lb-table-header">
+      <div>#</div><div>Wallet</div><div>Score</div><div>Earnings</div><div>Referrals</div><div>7d</div>
+    </div>
+    <div class="lb-row"><div class="lb-col-rank top">4</div><div class="lb-col-identity"><div class="lb-row-avatar" style="background:#f5f0ff">🧙</div><div><div class="lb-row-name">cryptowitch</div><div class="lb-row-handle">witch.mintware</div></div></div><div class="lb-col-score">95</div><div class="lb-col-earnings">$6,844</div><div class="lb-col-refs">41</div><div class="lb-col-change flat">—</div></div>
+    <div class="lb-row"><div class="lb-col-rank top">5</div><div class="lb-col-identity"><div class="lb-row-avatar" style="background:#f0fff4">🌿</div><div><div class="lb-row-name">yieldfarmer</div><div class="lb-row-handle">yield.mintware</div></div></div><div class="lb-col-score">94</div><div class="lb-col-earnings">$5,210</div><div class="lb-col-refs">28</div><div class="lb-col-change up">▲ 2</div></div>
+    <div class="lb-row"><div class="lb-col-rank">6</div><div class="lb-col-identity"><div class="lb-row-avatar" style="background:#fff0f0">🔴</div><div><div class="lb-row-name">redpool</div><div class="lb-row-handle">redpool.mintware</div></div></div><div class="lb-col-score">93</div><div class="lb-col-earnings">$4,980</div><div class="lb-col-refs">19</div><div class="lb-col-change down">▼ 1</div></div>
+    <div class="lb-row"><div class="lb-col-rank">7</div><div class="lb-col-identity"><div class="lb-row-avatar" style="background:#f0f4ff">⚡</div><div><div class="lb-row-name">flashlp</div><div class="lb-row-handle">flash.mintware</div></div></div><div class="lb-col-score">92</div><div class="lb-col-earnings">$4,102</div><div class="lb-col-refs">33</div><div class="lb-col-change up">▲ 5</div></div>
+    <div class="lb-row"><div class="lb-col-rank">8</div><div class="lb-col-identity"><div class="lb-row-avatar" style="background:#fffbf0">🌊</div><div><div class="lb-row-name">wavevault</div><div class="lb-row-handle">wave.mintware</div></div></div><div class="lb-col-score">91</div><div class="lb-col-earnings">$3,870</div><div class="lb-col-refs">22</div><div class="lb-col-change flat">—</div></div>
+    <div class="lb-gap">· · ·</div>
+    <div class="lb-row my-row"><div class="lb-col-rank top">847</div><div class="lb-col-identity"><div class="lb-row-avatar" style="background:var(--blue-dim)">🧙</div><div><div class="lb-row-name">nmstarchild <span style="font-size:10px;background:var(--blue-dim);color:var(--blue);padding:1px 6px;border-radius:10px;font-weight:600">you</span></div><div class="lb-row-handle">vaultking.mintware</div></div></div><div class="lb-col-score">82</div><div class="lb-col-earnings">$2,760</div><div class="lb-col-refs">23</div><div class="lb-col-change up">▲ 12</div></div>
+    <div class="lb-row"><div class="lb-col-rank">848</div><div class="lb-col-identity"><div class="lb-row-avatar" style="background:#f5f5f0">🎯</div><div><div class="lb-row-name">precisionlp</div><div class="lb-row-handle">0xprec…4a21</div></div></div><div class="lb-col-score">82</div><div class="lb-col-earnings">$2,740</div><div class="lb-col-refs">18</div><div class="lb-col-change flat">—</div></div>
+    <div class="lb-row"><div class="lb-col-rank">849</div><div class="lb-col-identity"><div class="lb-row-avatar" style="background:#fff8f0">🔥</div><div><div class="lb-row-name">hotstreak</div><div class="lb-row-handle">0xhot…9f33</div></div></div><div class="lb-col-score">81</div><div class="lb-col-earnings">$2,690</div><div class="lb-col-refs">14</div><div class="lb-col-change up">▲ 8</div></div>
+  </div>
+</div>
+
+<!-- ══ REFERRALS PAGE ══ -->
+<div class="page" id="page-referrals">
+  <div class="ref-wrap">
+    <div class="ref-title">Referrals</div>
+    <div class="ref-sub">Wallets you've brought in and your earnings from each</div>
+    <div class="ref-stats">
+      <div class="ref-stat-card ref-earn-card">
+        <div class="ref-stat-label">Referral earnings</div>
+        <div class="ref-stat-val">$714.88</div>
+        <div class="ref-stat-sub">All time</div>
+      </div>
+      <div class="ref-stat-card">
+        <div class="ref-stat-label">Wallets referred</div>
+        <div class="ref-stat-val">23</div>
+        <div class="ref-stat-sub">Direct referrals</div>
+      </div>
+      <div class="ref-stat-card">
+        <div class="ref-stat-label">Network size</div>
+        <div class="ref-stat-val">61</div>
+        <div class="ref-stat-sub">Including downstream</div>
+      </div>
+      <div class="ref-stat-card">
+        <div class="ref-stat-label">Avg referred score</div>
+        <div class="ref-stat-val">71</div>
+        <div class="ref-stat-sub">Your network quality</div>
+      </div>
+    </div>
+
+    <div class="ref-link-box">
+      <div class="ref-link-left">
+        <div class="ref-link-title">Your referral link</div>
+        <div style="font-size:12px;color:var(--ink-3);margin-top:2px">Share this link — every wallet that joins through it is attributed to you</div>
+        <div class="ref-link-url">mintware.xyz/ref/vaultking</div>
+      </div>
+      <button class="ref-copy-btn" onclick="this.textContent='Copied!';setTimeout(()=>this.textContent='Copy link',1500)">Copy link</button>
+    </div>
+
+    <div class="ref-table-title">Your referred wallets</div>
+    <div class="ref-table">
+      <div class="ref-table-header">
+        <div>Wallet</div><div>Score</div><div>Earned you</div><div>Joined</div><div>Active</div>
+      </div>
+      <div class="ref-row">
+        <div><div class="ref-row-avatar" style="background:#f0fff4">🌿</div><div><div style="font-weight:600;font-size:13px;color:var(--ink)">yieldfarmer</div><div class="ref-row-handle">yield.mintware</div></div></div>
+        <div><span class="ref-score-pill score-high">94</span></div>
+        <div style="color:var(--green);font-weight:600">$142.30</div>
+        <div>Jan 2024</div>
+        <div style="color:var(--green)">● Active</div>
+      </div>
+      <div class="ref-row">
+        <div><div class="ref-row-avatar" style="background:#f0f4ff">⚡</div><div><div style="font-weight:600;font-size:13px;color:var(--ink)">flashlp</div><div class="ref-row-handle">flash.mintware</div></div></div>
+        <div><span class="ref-score-pill score-high">92</span></div>
+        <div style="color:var(--green);font-weight:600">$118.70</div>
+        <div>Mar 2024</div>
+        <div style="color:var(--green)">● Active</div>
+      </div>
+      <div class="ref-row">
+        <div><div class="ref-row-avatar" style="background:#fffbf0">🌊</div><div><div style="font-weight:600;font-size:13px;color:var(--ink)">wavevault</div><div class="ref-row-handle">wave.mintware</div></div></div>
+        <div><span class="ref-score-pill score-high">91</span></div>
+        <div style="color:var(--green);font-weight:600">$98.44</div>
+        <div>Feb 2024</div>
+        <div style="color:var(--green)">● Active</div>
+      </div>
+      <div class="ref-row">
+        <div><div class="ref-row-avatar" style="background:#f5f5f0">🎯</div><div><div style="font-weight:600;font-size:13px;color:var(--ink)">precisionlp</div><div class="ref-row-handle">0xprec…4a21</div></div></div>
+        <div><span class="ref-score-pill score-mid">82</span></div>
+        <div style="color:var(--green);font-weight:600">$74.20</div>
+        <div>Apr 2024</div>
+        <div style="color:var(--green)">● Active</div>
+      </div>
+      <div class="ref-row">
+        <div><div class="ref-row-avatar" style="background:#f8f0ff">🦋</div><div><div style="font-weight:600;font-size:13px;color:var(--ink)">metamorphic</div><div class="ref-row-handle">meta.mintware</div></div></div>
+        <div><span class="ref-score-pill score-mid">78</span></div>
+        <div style="color:var(--green);font-weight:600">$61.88</div>
+        <div>May 2024</div>
+        <div style="color:#aaa">○ Inactive</div>
+      </div>
+      <div class="ref-row">
+        <div><div class="ref-row-avatar" style="background:#f5f5f0">👤</div><div><div style="font-weight:600;font-size:13px;color:var(--ink)">0xanon…8821</div><div class="ref-row-handle">unregistered</div></div></div>
+        <div><span class="ref-score-pill score-mid">61</span></div>
+        <div style="color:var(--green);font-weight:600">$44.10</div>
+        <div>Jun 2024</div>
+        <div style="color:var(--green)">● Active</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SWAP PAGE ══ -->
+<div class="page" id="page-swap">
+  <div class="swap-wrap">
+    <div class="swap-card">
+      <div class="swap-title">Swap</div>
+      <div class="swap-sub">Trade tokens instantly · best price across DEXs</div>
+
+      <div class="swap-field">
+        <div class="swap-field-label">
+          <span>You pay</span>
+          <span>Balance: 0.29 ETH</span>
+        </div>
+        <div class="swap-field-row">
+          <input class="swap-amount" type="number" placeholder="0" value="0.1"/>
+          <button class="swap-token-btn">Ξ ETH ▾</button>
+        </div>
+        <div class="swap-usd">≈ $197.80</div>
+      </div>
+
+      <div class="swap-flip">
+        <button class="swap-flip-btn">⇅</button>
+      </div>
+
+      <div class="swap-field">
+        <div class="swap-field-label">
+          <span>You receive</span>
+          <span>Balance: 28 USDC</span>
+        </div>
+        <div class="swap-field-row">
+          <input class="swap-amount" type="number" placeholder="0" value="197.42" readonly/>
+          <button class="swap-token-btn">USDC ▾</button>
+        </div>
+        <div class="swap-usd">≈ $197.42</div>
+      </div>
+
+      <div class="swap-details">
+        <div class="swap-detail-row"><span>Rate</span><span>1 ETH = 1,974.20 USDC</span></div>
+        <div class="swap-detail-row"><span>Price impact</span><span style="color:var(--green)">0.02%</span></div>
+        <div class="swap-detail-row"><span>Route</span><span>Uniswap V4</span></div>
+        <div class="swap-detail-row"><span>Network fee</span><span>~$1.40</span></div>
+      </div>
+
+      <button class="swap-btn">Swap ETH → USDC</button>
+
+      <div class="swap-attr-note">
+        ✦ This swap contributes to your Attribution score
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showPage(id, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.app-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  el.classList.add('active');
+}
+function setSubTab(el){
+  el.closest('.p-sub-tabs').querySelectorAll('.p-sub-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+function setLbTab(el){
+  el.closest('.lb-sub-tabs').querySelectorAll('.lb-sub-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+function setLbFilter(el){
+  el.closest('.lb-filters').querySelectorAll('.lb-filter').forEach(f=>f.classList.remove('active'));
+  el.classList.add('active');
+}
+function handleWalletInput(val){
+  if(val.length > 10){
+    document.querySelector('.connected-pill').innerHTML =
+      '<span class="connected-dot" style="background:#f59e0b"></span> Viewing: '+val.substring(0,6)+'…'+val.slice(-4);
+  } else {
+    document.querySelector('.connected-pill').innerHTML =
+      '<span class="connected-dot"></span> 0xf7b1…e2d6';
+  }
+}
+</script>
+</body>
+</html>

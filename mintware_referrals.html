@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mintware — Referrals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#0052FF;--blue-dim:rgba(0,82,255,0.07);--blue-mid:rgba(0,82,255,0.14);
+  --ink:#1A1A2E;--ink-2:#3A3C52;--ink-3:#8A8C9E;
+  --surface:#F7F6FF;--white:#ffffff;
+  --green:#16a34a;--green-bg:#f0fdf4;--green-border:#bbf7d0;
+  --border:rgba(26,26,46,0.08);--border-strong:rgba(26,26,46,0.13);
+  --dark:#0A0D14;--dark-2:#11141E;--dark-3:#181C29;
+  --dark-border:rgba(255,255,255,0.06);
+  --dark-text:rgba(255,255,255,0.88);--dark-sub:rgba(255,255,255,0.36);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--surface);color:var(--ink)}
+
+/* NAV */
+.app-nav{
+  background:rgba(255,255,255,0.94);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+  padding:0 28px;display:flex;align-items:center;
+  position:sticky;top:0;z-index:100;height:56px;gap:16px;
+}
+.app-logo{font-family:Georgia,serif;font-size:18px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px;flex-shrink:0}
+.app-logo-mark{width:22px;height:22px;border-radius:5px;background:var(--blue);display:flex;align-items:center;justify-content:center}
+.app-logo-mark svg{width:12px;height:12px;fill:white}
+.wallet-search{flex:1;max-width:420px;position:relative}
+.wallet-search input{
+  width:100%;padding:8px 14px 8px 36px;
+  border:1.5px solid var(--border-strong);border-radius:20px;
+  font-size:12px;font-family:'DM Mono',monospace;color:var(--ink);
+  background:var(--surface);outline:none;transition:all 0.15s;
+}
+.wallet-search input:focus{border-color:var(--blue);background:var(--white)}
+.wallet-search input::placeholder{color:var(--ink-3);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px}
+.wallet-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none;opacity:0.4}
+.app-nav-tabs{display:flex;align-items:stretch;gap:0;margin-left:8px}
+.app-tab{
+  padding:0 16px;font-size:13px;font-weight:500;color:var(--ink-3);
+  cursor:pointer;border-bottom:2px solid transparent;
+  display:flex;align-items:center;height:56px;transition:all 0.15s;white-space:nowrap;
+}
+.app-tab:hover{color:var(--ink)}
+.app-tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+.app-nav-right{margin-left:auto;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.connected-pill{
+  display:flex;align-items:center;gap:6px;
+  background:var(--surface);border:1px solid var(--border-strong);
+  border-radius:20px;padding:6px 12px;font-size:11px;font-weight:600;
+  color:var(--ink-2);font-family:'DM Mono',monospace;cursor:pointer;transition:all 0.15s;
+}
+.connected-pill:hover{border-color:var(--blue);color:var(--blue)}
+.connected-dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+
+/* ══ TOP SNAPSHOT — brand white ══ */
+.ref-top{background:var(--white);padding:28px 28px 0;border-bottom:1px solid var(--border)}
+.ref-top-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:16px}
+.ref-top-left h1{font-family:Georgia,serif;font-size:26px;font-weight:700;color:var(--ink);letter-spacing:-0.5px;margin-bottom:4px}
+.ref-top-left p{font-size:13px;color:var(--ink-3)}
+.ref-link-row{display:flex;align-items:center;gap:10px}
+.ref-link-url{
+  font-family:'DM Mono',monospace;font-size:12px;color:var(--blue);
+  background:var(--blue-dim);border:1px solid rgba(0,82,255,0.15);
+  padding:8px 14px;border-radius:8px;
+}
+.ref-copy-btn{
+  background:var(--ink);color:#fff;border:none;padding:9px 18px;
+  border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif;transition:background 0.15s;white-space:nowrap;
+}
+.ref-copy-btn:hover{background:var(--blue)}
+
+.ref-snapshot{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-top:1px solid var(--border)}
+.snap-stat{padding:16px 20px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:3px}
+.snap-stat:last-child{border-right:none}
+.snap-label{font-size:11px;color:#bbb;text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
+.snap-val{font-size:20px;font-weight:700;color:var(--ink);font-family:'DM Mono',monospace;letter-spacing:-0.5px}
+.snap-sub{font-size:11px;color:#bbb;margin-top:1px}
+.snap-stat.earn{background:var(--green-bg);border-top:2px solid var(--green)}
+.snap-stat.earn .snap-label{color:var(--green)}
+.snap-stat.earn .snap-val{color:#14532d}
+
+/* ══ POOLS SECTION — dark ══ */
+.pools-section{background:var(--dark);min-height:70vh;padding:40px 28px 60px}
+
+.pools-header{text-align:center;margin-bottom:36px}
+.pools-badge{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(0,82,255,0.14);border:1px solid rgba(0,82,255,0.22);
+  border-radius:20px;padding:5px 14px;
+  font-size:12px;font-weight:600;color:#6b9fff;margin-bottom:18px;
+}
+.pools-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--blue)}
+.pools-title{font-family:Georgia,serif;font-size:34px;font-weight:700;color:var(--dark-text);letter-spacing:-1px;margin-bottom:8px}
+.pools-sub{font-size:14px;color:var(--dark-sub);max-width:460px;margin:0 auto;line-height:1.6}
+
+/* STATS STRIP — Mintware brand style (matches snapshot bar above) */
+.pool-stats-strip{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+  max-width:800px;margin:0 auto 36px;
+  border:1px solid var(--dark-border);border-radius:14px;overflow:hidden;
+}
+.pool-stat-card{
+  padding:18px 24px;border-right:1px solid var(--dark-border);
+  display:flex;flex-direction:column;gap:4px;
+}
+.pool-stat-card:last-child{border-right:none}
+.pool-stat-label{font-size:11px;color:var(--dark-sub);text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
+.pool-stat-val{font-size:22px;font-weight:700;color:var(--dark-text);font-family:'DM Mono',monospace;letter-spacing:-0.5px}
+.pool-stat-sub{font-size:11px;color:var(--dark-sub);margin-top:1px}
+.pool-stat-card.earn{border-top:2px solid var(--green)}
+.pool-stat-card.earn .pool-stat-label{color:#4ade80}
+.pool-stat-card.earn .pool-stat-val{color:#4ade80}
+
+/* CONTROLS */
+.pool-controls{
+  display:flex;align-items:center;gap:10px;
+  background:var(--dark-2);border:1px solid var(--dark-border);
+  border-radius:12px;padding:12px 16px;margin-bottom:2px;flex-wrap:wrap;
+}
+.pool-search{flex:1;min-width:220px;position:relative}
+.pool-search input{
+  width:100%;padding:8px 14px 8px 34px;
+  background:var(--dark-3);border:1px solid var(--dark-border);
+  border-radius:8px;font-size:13px;color:var(--dark-text);
+  outline:none;transition:border-color 0.15s;font-family:'Plus Jakarta Sans',sans-serif;
+}
+.pool-search input:focus{border-color:rgba(0,82,255,0.5)}
+.pool-search input::placeholder{color:var(--dark-sub)}
+.pool-search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;opacity:0.3;pointer-events:none}
+.pool-filter-group{display:flex;align-items:center;gap:6px}
+.pool-filter{
+  padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;
+  cursor:pointer;border:1px solid var(--dark-border);color:var(--dark-sub);
+  background:transparent;transition:all 0.15s;
+}
+.pool-filter:hover{border-color:rgba(0,82,255,0.4);color:#6b9fff}
+.pool-filter.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.pool-filter-label{font-size:12px;color:var(--dark-sub);margin-right:2px;flex-shrink:0}
+.pool-sort-btn{
+  display:flex;align-items:center;gap:6px;
+  background:var(--dark-3);border:1px solid var(--dark-border);
+  border-radius:8px;padding:7px 12px;font-size:12px;
+  color:var(--dark-sub);cursor:pointer;transition:border-color 0.15s;
+}
+.pool-sort-btn:hover{border-color:rgba(0,82,255,0.4)}
+
+/* TABLE */
+.pool-table-wrap{
+  background:var(--dark-2);border:1px solid var(--dark-border);
+  border-radius:14px;overflow:hidden;
+}
+.pool-table-head{
+  display:grid;
+  grid-template-columns:2fr 90px 130px 130px 110px 120px 48px;
+  padding:12px 20px;border-bottom:1px solid var(--dark-border);
+}
+.pool-th{
+  font-size:11px;font-weight:600;color:var(--dark-sub);
+  display:flex;align-items:center;gap:4px;cursor:pointer;
+  text-transform:uppercase;letter-spacing:0.5px;transition:color 0.15s;
+}
+.pool-th:not(:first-child){justify-content:flex-end}
+.pool-th:hover{color:var(--dark-text)}
+.pool-th.sorted{color:var(--dark-text)}
+.th-sort{font-size:9px;opacity:0.5}
+
+.pool-row-wrap{border-bottom:1px solid var(--dark-border)}
+.pool-row-wrap:last-child{border-bottom:none}
+.pool-row{
+  display:grid;
+  grid-template-columns:2fr 90px 130px 130px 110px 120px 48px;
+  padding:14px 20px;align-items:center;
+  cursor:pointer;transition:background 0.12s;
+}
+.pool-row:hover{background:rgba(255,255,255,0.025)}
+.pool-row.expanded{background:rgba(255,255,255,0.025)}
+
+/* SINGLE TOKEN */
+.pool-token-cell{display:flex;align-items:center;gap:12px}
+.pool-token-icon{
+  width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+  border:1.5px solid var(--dark-border);
+}
+.pool-token-name{font-size:14px;font-weight:700;color:var(--dark-text)}
+.pool-token-chain{font-size:11px;color:var(--dark-sub);margin-top:2px}
+
+.pool-cell{font-size:13px;color:var(--dark-text);text-align:right;font-family:'DM Mono',monospace}
+.pool-cell-status{text-align:right}
+.status-pill{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;
+}
+.s-active{background:rgba(22,163,74,0.12);color:#4ade80;border:1px solid rgba(22,163,74,0.2)}
+.s-hot{background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.2)}
+.s-new{background:rgba(0,82,255,0.12);color:#6b9fff;border:1px solid rgba(0,82,255,0.2)}
+
+.ref-pct{font-size:14px;font-weight:700;font-family:'DM Mono',monospace;color:#4ade80;text-align:right}
+.ref-pct-bonus{font-size:10px;color:#c084fc;display:block;margin-top:1px;text-align:right}
+.ref-pct-locked{font-size:10px;color:var(--dark-sub);display:block;margin-top:1px;text-align:right}
+
+.pool-chevron{display:flex;align-items:center;justify-content:flex-end;color:var(--dark-sub);font-size:14px;transition:transform 0.2s}
+.pool-chevron.open{transform:rotate(180deg)}
+
+/* EXPANDED */
+.pool-detail{display:none;padding:0 20px 20px;border-top:1px solid var(--dark-border)}
+.pool-detail.open{display:block}
+.pool-detail-inner{
+  background:var(--dark-3);border:1px solid var(--dark-border);
+  border-radius:12px;padding:20px;
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;
+}
+.detail-section-title{font-size:10px;font-weight:700;color:var(--dark-sub);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+
+.reward-rows{display:flex;flex-direction:column;gap:10px}
+.reward-row{display:flex;flex-direction:column;gap:5px}
+.reward-row-label{display:flex;justify-content:space-between;align-items:center}
+.reward-who{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--dark-sub)}
+.reward-who-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dot-r{background:#4ade80}.dot-b{background:#6b9fff}.dot-s{background:#c084fc}
+.reward-pct-val{font-size:13px;font-weight:700;font-family:'DM Mono',monospace}
+.pct-r{color:#4ade80}.pct-b{color:#6b9fff}.pct-s{color:#c084fc}
+.reward-bar-track{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
+.reward-bar-fill{height:100%;border-radius:2px}
+.fill-r{background:#4ade80}.fill-b{background:#6b9fff}.fill-s{background:#c084fc}
+
+.detail-meta{display:flex;flex-direction:column;gap:10px}
+.detail-meta-row{display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.detail-meta-row span:first-child{color:var(--dark-sub)}
+.detail-meta-row span:last-child{color:var(--dark-text);font-weight:600;font-family:'DM Mono',monospace}
+
+.detail-actions{display:flex;flex-direction:column;gap:10px;justify-content:space-between}
+.score-qualify{background:rgba(192,132,252,0.08);border:1px solid rgba(192,132,252,0.18);border-radius:9px;padding:10px 12px;font-size:12px;color:#c084fc;line-height:1.5}
+.score-qualify.yes{background:rgba(74,222,128,0.07);border-color:rgba(74,222,128,0.18);color:#4ade80}
+.detail-refer-btn{
+  background:var(--blue);color:#fff;border:none;
+  padding:12px;border-radius:10px;font-size:14px;font-weight:700;
+  cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:background 0.15s;text-align:center;
+}
+.detail-refer-btn:hover{background:#0040cc}
+.detail-copy-link{text-align:center;font-size:12px;color:var(--dark-sub);cursor:pointer;transition:color 0.15s}
+.detail-copy-link:hover{color:#6b9fff}
+</style>
+</head>
+<body>
+
+<nav class="app-nav">
+  <div class="app-logo">
+    <div class="app-logo-mark"><svg viewBox="0 0 14 14"><path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5Z"/></svg></div>
+    Mintware
+  </div>
+  <div class="wallet-search">
+    <span class="wallet-search-icon">⌕</span>
+    <input type="text" placeholder="Paste any wallet address or ENS to explore..."/>
+  </div>
+  <div class="app-nav-tabs">
+    <div class="app-tab">Portfolio</div>
+    <div class="app-tab">Leaderboard</div>
+    <div class="app-tab active">Referrals</div>
+    <div class="app-tab">Swap</div>
+  </div>
+  <div class="app-nav-right">
+    <div class="connected-pill"><span class="connected-dot"></span>0xf7b1…e2d6</div>
+  </div>
+</nav>
+
+<!-- TOP SNAPSHOT -->
+<div class="ref-top">
+  <div class="ref-top-header">
+    <div class="ref-top-left">
+      <h1>Referrals</h1>
+      <p>Earn from every wallet you bring in and every pool they participate in</p>
+    </div>
+    <div class="ref-link-row">
+      <div class="ref-link-url">mintware.xyz/ref/vaultking</div>
+      <button class="ref-copy-btn" onclick="this.textContent='Copied ✓';setTimeout(()=>this.textContent='Copy link',1800)">Copy link</button>
+    </div>
+  </div>
+  <div class="ref-snapshot">
+    <div class="snap-stat earn">
+      <span class="snap-label">Referral earnings</span>
+      <span class="snap-val">$714.88</span>
+      <span class="snap-sub">+$84 this month</span>
+    </div>
+    <div class="snap-stat">
+      <span class="snap-label">Wallets referred</span>
+      <span class="snap-val">23</span>
+      <span class="snap-sub">Direct referrals</span>
+    </div>
+    <div class="snap-stat">
+      <span class="snap-label">Network size</span>
+      <span class="snap-val">61</span>
+      <span class="snap-sub">Including downstream</span>
+    </div>
+    <div class="snap-stat">
+      <span class="snap-label">Avg referred score</span>
+      <span class="snap-val">71</span>
+      <span class="snap-sub">Your network quality</span>
+    </div>
+    <div class="snap-stat">
+      <span class="snap-label">Active pools</span>
+      <span class="snap-val">6</span>
+      <span class="snap-sub">You're referring into</span>
+    </div>
+  </div>
+</div>
+
+<!-- POOLS SECTION -->
+<div class="pools-section">
+
+  <div class="pools-header">
+    <div class="pools-badge"><span class="pools-badge-dot"></span>Token reward pools</div>
+    <div class="pools-title">Reward Pools</div>
+    <div class="pools-sub">Explore tokens with active reward pools. Refer buyers and earn — your Attribution score multiplies your cut.</div>
+  </div>
+
+  <!-- STATS STRIP — brand consistent -->
+  <div class="pool-stats-strip">
+    <div class="pool-stat-card earn">
+      <span class="pool-stat-label">Paid out this month</span>
+      <span class="pool-stat-val">$18.4K</span>
+      <span class="pool-stat-sub">+$3.2K this week</span>
+    </div>
+    <div class="pool-stat-card">
+      <span class="pool-stat-label">Active pools</span>
+      <span class="pool-stat-val">12</span>
+      <span class="pool-stat-sub">Across 4 chains</span>
+    </div>
+    <div class="pool-stat-card">
+      <span class="pool-stat-label">Total pools</span>
+      <span class="pool-stat-val">38</span>
+      <span class="pool-stat-sub">All time</span>
+    </div>
+    <div class="pool-stat-card">
+      <span class="pool-stat-label">Total value locked</span>
+      <span class="pool-stat-val">$284K</span>
+      <span class="pool-stat-sub">Across all pools</span>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="pool-controls">
+    <div class="pool-search">
+      <span class="pool-search-icon">⌕</span>
+      <input type="text" placeholder="Search by token symbol, name, or address..."/>
+    </div>
+    <div class="pool-filter-group">
+      <span class="pool-filter-label">Status</span>
+      <div class="pool-filter active" onclick="setPF(this)">All</div>
+      <div class="pool-filter" onclick="setPF(this)">Active</div>
+      <div class="pool-filter" onclick="setPF(this)">Inactive</div>
+    </div>
+    <div class="pool-sort-btn">Newest first ▾</div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="pool-table-wrap">
+    <div class="pool-table-head">
+      <div class="pool-th">Pool</div>
+      <div class="pool-th">Status</div>
+      <div class="pool-th sorted">Pool size <span class="th-sort">▼</span></div>
+      <div class="pool-th">You earn <span class="th-sort">⇅</span></div>
+      <div class="pool-th">Buyer gets <span class="th-sort">⇅</span></div>
+      <div class="pool-th">Score bonus <span class="th-sort">⇅</span></div>
+      <div class="pool-th"></div>
+    </div>
+
+    <!-- PEPE -->
+    <div class="pool-row-wrap">
+      <div class="pool-row" onclick="toggleRow(this)">
+        <div class="pool-token-cell">
+          <div class="pool-token-icon" style="background:rgba(34,197,94,0.1)">🐸</div>
+          <div>
+            <div class="pool-token-name">Pepe</div>
+            <div class="pool-token-chain">PEPE · Ethereum</div>
+          </div>
+        </div>
+        <div class="pool-cell-status"><span class="status-pill s-hot">🔥 Hot</span></div>
+        <div class="pool-cell">$48,200</div>
+        <div class="ref-pct">4%<span class="ref-pct-bonus">+3% score bonus</span></div>
+        <div class="pool-cell">1%</div>
+        <div class="pool-cell" style="color:#c084fc">80+ score</div>
+        <div class="pool-chevron">▾</div>
+      </div>
+      <div class="pool-detail">
+        <div class="pool-detail-inner">
+          <div>
+            <div class="detail-section-title">Reward breakdown</div>
+            <div class="reward-rows">
+              <div class="reward-row"><div class="reward-row-label"><div class="reward-who"><span class="reward-who-dot dot-r"></span>You (referrer)</div><div class="reward-pct-val pct-r">4%</div></div><div class="reward-bar-track"><div class="reward-bar-fill fill-r" style="width:80%"></div></div></div>
+              <div class="reward-row"><div class="reward-row-label"><div class="reward-who"><span class="reward-who-dot dot-b"></span>Buyer gets</div><div class="reward-pct-val pct-b">1%</div></div><div class="reward-bar-track"><div class="reward-bar-fill fill-b" style="width:20%"></div></div></div>
+              <div class="reward-row"><div class="reward-row-label"><div class="reward-who"><span class="reward-who-dot dot-s"></span>Score bonus (80+)</div><div class="reward-pct-val pct-s">+3%</div></div><div class="reward-bar-track"><div class="reward-bar-fill fill-s" style="width:60%"></div></div></div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-section-title">Pool details</div>
+            <div class="detail-meta">
+              <div class="detail-meta-row"><span>Pool size</span><span>$48,200</span></div>
+              <div class="detail-meta-row"><span>Remaining</span><span>14 days</span></div>
+              <div class="detail-meta-row"><span>Total referred</span><span>842 wallets</span></div>
+              <div class="detail-meta-row"><span>Your referrals</span><span>0</span></div>
+              <div class="detail-meta-row"><span>Chain</span><span>Ethereum</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-section-title">Your position</div>
+            <div class="detail-actions">
+              <div class="score-qualify yes">✦ Your score (82) qualifies for the full +3% bonus. You earn 7% total per referral.</div>
+              <button class="detail-refer-btn">Get referral link →</button>
+              <div class="detail-copy-link" onclick="this.textContent='Copied!';setTimeout(()=>this.textContent='Copy pool link',1500)">Copy pool link</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOGE -->
+    <div class="pool-row-wrap">
+      <div class="pool-row" onclick="toggleRow(this)">
+        <div class="pool-token-cell">
+          <div class="pool-token-icon" style="background:rgba(251,191,36,0.1)">🐕</div>
+          <div>
+            <div class="pool-token-name">Dogecoin</div>
+            <div class="pool-token-chain">DOGE · Base</div>
+          </div>
+        </div>
+        <div class="pool-cell-status"><span class="status-pill s-hot">🔥 Hot</span></div>
+        <div class="pool-cell">$42,500</div>
+        <div class="ref-pct">5%<span class="ref-pct-bonus">+5% score bonus</span></div>
+        <div class="pool-cell">2%</div>
+        <div class="pool-cell" style="color:#c084fc">80+ score</div>
+        <div class="pool-chevron">▾</div>
+      </div>
+      <div class="pool-detail">
+        <div class="pool-detail-inner">
+          <div>
+            <div class="detail-section-title">Reward breakdown</div>
+            <div class="reward-rows">
+              <div class="reward-row"><div class="reward-row-label"><div class="reward-who"><span class="reward-who-dot dot-r"></span>You (referrer)</div><div class="reward-pct-val pct-r">5%</div></div><div class="reward-bar-track"><div class="reward-bar-fill fill-r" style="width:100%"></div></div></div>
+              <div class="reward-row"><div class="reward-row-label"><div class="reward-who"><span class="reward-who-dot dot-b"></span>Buyer gets</div><div class="reward-pct-val pct-b">2%</div></div><div class="reward-bar-track"><div class="reward-bar-fill fill-b" style="width:40%"></div></div></div>
+              <div class="reward-row"><div class="reward-row-label"><div class="reward-who"><span class="reward-who-dot dot-s"></span>Score bonus (80+)</div><div class="reward-pct-val pct-s">+5%</div></div><div class="reward-bar-track"><div class="reward-bar-fill fill-s" style="width:100%"></div></div></div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-section-title">Pool details</div>
+            <div class="detail-meta">
+              <div class="detail-meta-row"><span>Pool size</span><span>$42,500</span></div>
+              <div class="detail-meta-row"><span>Remaining</span><span>10 days</span></div>
+              <div class="detail-meta-row"><span>Total referred</span><span>1,240 wallets</span></div>
+              <div class="detail-meta-row"><span>Your referrals</span><span>4</span></div>
+              <div class="detail-meta-row"><span>Chain</span><span>Base</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-section-title">Your position</div>
+            <div class="detail-actions">
+              <div class="score-qualify yes">✦ Your score (82) qualifies for the +5% bonus. You earn 10% total per referral.</div>
+              <button class="detail-refer-btn">Get referral link →</button>
+              <div class="detail-copy-link" onclick="this.textContent='Copied!';setTimeout(()=>this.textContent='Copy pool link',1500)">Copy pool link</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KEKE -->
+    <div class="pool-row-wrap">
+      <div class="pool-row" onclick="toggleRow(this)">
+        <div class="pool-token-cell">
+          <div class="pool-token-icon" style="background:rgba(168,85,247,0.1)">🐱</div>
+          <div>
+            <div class="pool-token-name">Keke</div>
+            <div class="pool-token-chain">KEKE · Base</div>
+          </div>
+        </div>
+        <div class="pool-cell-status"><span class="status-pill s-new">★ New</span></div>
+        <div class="pool-cell">$18,800</div>
+        <div class="ref-pct">3%<span class="ref-pct-locked">+4% need 85+</span></div>
+        <div class="pool-cell">2%</div>
+        <div class="pool-cell" style="color:var(--dark-sub)">85+ score</div>
+        <div class="pool-chevron">▾</div>
+      </div>
+      <div class="pool-detail">
+        <div class="pool-detail-inner">
+          <div>
+            <div class="detail-section-title">Reward breakdown</div>
+            <div class="reward-rows">
+              <div class="reward-row"><div class="reward-row-label"><div class="reward-who"><span class="reward-who-dot dot-r"></span>You (referrer)</div><div class="reward-pct-val pct-r">3%</div></div><div class="reward-bar-track"><div class="reward-bar-fill fill-r" style="width:60%"></div></div></div>
+              <div class="reward-row"><div class="reward-row-label"><div class="reward-who"><span class="reward-who-dot dot-b"></span>Buyer gets</div><div class="reward-pct-val pct-b">2%</div></div><div class="reward-bar-track"><div class="reward-bar-fill fill-b" style="width:40%"></div></div></div>
+              <div class="reward-row"><div class="reward-row-label"><div class="reward-who"><span class="reward-who-dot dot-s"></span>Score bonus (85+)</div><div class="reward-pct-val pct-s">+4%</div></div><div class="reward-bar-track"><div class="reward-bar-fill fill-s" style="width:80%"></div></div></div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-section-title">Pool details</div>
+            <div class="detail-meta">
+              <div class="detail-meta-row"><span>Pool size</span><span>$18,800</span></div>
+              <div class="detail-meta-row"><span>Remaining</span><span>30 days</span></div>
+              <div class="detail-meta-row"><span>Total referred</span><span>188 wallets</span></div>
+              <div class="detail-meta-row"><span>Your referrals</span><span>0</span></div>
+              <div class="detail-meta-row"><span>Chain</span><span>Base</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-section-title">Your position</div>
+            <div class="detail-actions">
+              <div class="score-qualify">◇ Score 85 needed for +4% bonus. You're at 82 — 3 points away.</div>
+              <button class="detail-refer-btn">Get referral link →</button>
+              <div class="detail-copy-link" onclick="this.textContent='Copied!';setTimeout(()=>this.textContent='Copy pool link',1500)">Copy pool link</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHIB -->
+    <div class="pool-row-wrap">
+      <div class="pool-row" onclick="toggleRow(this)">
+        <div class="pool-token-cell">
+          <div class="pool-token-icon" style="background:rgba(239,68,68,0.1)">🐶</div>
+          <div>
+            <div class="pool-token-name">Shiba Inu</div>
+            <div class="pool-token-chain">SHIB · Ethereum</div>
+          </div>
+        </div>
+        <div class="pool-cell-status"><span class="status-pill s-active">● Active</span></div>
+        <div class="pool-cell">$31,400</div>
+        <div class="ref-pct">3%<span class="ref-pct-bonus">+2% score bonus</span></div>
+        <div class="pool-cell">1.5%</div>
+        <div class="pool-cell" style="color:#c084fc">70+ score</div>
+        <div class="pool-chevron">▾</div>
+      </div>
+      <div class="pool-detail">
+        <div class="pool-detail-inner">
+          <div>
+            <div class="detail-section-title">Reward breakdown</div>
+            <div class="reward-rows">
+              <div class="reward-row"><div class="reward-row-label"><div class="reward-who"><span class="reward-who-dot dot-r"></span>You (referrer)</div><div class="reward-pct-val pct-r">3%</div></div><div class="reward-bar-track"><div class="reward-bar-fill fill-r" style="width:60%"></div></div></div>
+              <div class="reward-row"><div class="reward-row-label"><div class="reward-who"><span class="reward-who-dot dot-b"></span>Buyer gets</div><div class="reward-pct-val pct-b">1.5%</div></div><div class="reward-bar-track"><div class="reward-bar-fill fill-b" style="width:30%"></div></div></div>
+              <div class="reward-row"><div class="reward-row-label"><div class="reward-who"><span class="reward-who-dot dot-s"></span>Score bonus (70+)</div><div class="reward-pct-val pct-s">+2%</div></div><div class="reward-bar-track"><div class="reward-bar-fill fill-s" style="width:40%"></div></div></div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-section-title">Pool details</div>
+            <div class="detail-meta">
+              <div class="detail-meta-row"><span>Pool size</span><span>$31,400</span></div>
+              <div class="detail-meta-row"><span>Remaining</span><span>7 days</span></div>
+              <div class="detail-meta-row"><span>Total referred</span><span>621 wallets</span></div>
+              <div class="detail-meta-row"><span>Your referrals</span><span>1</span></div>
+              <div class="detail-meta-row"><span>Chain</span><span>Ethereum</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-section-title">Your position</div>
+            <div class="detail-actions">
+              <div class="score-qualify yes">✦ Your score (82) qualifies for the +2% bonus. You earn 5% total per referral.</div>
+              <button class="detail-refer-btn">Get referral link →</button>
+              <div class="detail-copy-link" onclick="this.textContent='Copied!';setTimeout(()=>this.textContent='Copy pool link',1500)">Copy pool link</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BONK -->
+    <div class="pool-row-wrap">
+      <div class="pool-row" onclick="toggleRow(this)">
+        <div class="pool-token-cell">
+          <div class="pool-token-icon" style="background:rgba(249,115,22,0.1)">🦴</div>
+          <div>
+            <div class="pool-token-name">Bonk</div>
+            <div class="pool-token-chain">BONK · Sonic</div>
+          </div>
+        </div>
+        <div class="pool-cell-status"><span class="status-pill s-new">★ New</span></div>
+        <div class="pool-cell">$9,600</div>
+        <div class="ref-pct">4%<span class="ref-pct-bonus">+3% score bonus</span></div>
+        <div class="pool-cell">1%</div>
+        <div class="pool-cell" style="color:#c084fc">78+ score</div>
+        <div class="pool-chevron">▾</div>
+      </div>
+      <div class="pool-detail">
+        <div class="pool-detail-inner">
+          <div>
+            <div class="detail-section-title">Reward breakdown</div>
+            <div class="reward-rows">
+              <div class="reward-row"><div class="reward-row-label"><div class="reward-who"><span class="reward-who-dot dot-r"></span>You (referrer)</div><div class="reward-pct-val pct-r">4%</div></div><div class="reward-bar-track"><div class="reward-bar-fill fill-r" style="width:80%"></div></div></div>
+              <div class="reward-row"><div class="reward-row-label"><div class="reward-who"><span class="reward-who-dot dot-b"></span>Buyer gets</div><div class="reward-pct-val pct-b">1%</div></div><div class="reward-bar-track"><div class="reward-bar-fill fill-b" style="width:20%"></div></div></div>
+              <div class="reward-row"><div class="reward-row-label"><div class="reward-who"><span class="reward-who-dot dot-s"></span>Score bonus (78+)</div><div class="reward-pct-val pct-s">+3%</div></div><div class="reward-bar-track"><div class="reward-bar-fill fill-s" style="width:60%"></div></div></div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-section-title">Pool details</div>
+            <div class="detail-meta">
+              <div class="detail-meta-row"><span>Pool size</span><span>$9,600</span></div>
+              <div class="detail-meta-row"><span>Remaining</span><span>28 days</span></div>
+              <div class="detail-meta-row"><span>Total referred</span><span>88 wallets</span></div>
+              <div class="detail-meta-row"><span>Your referrals</span><span>0</span></div>
+              <div class="detail-meta-row"><span>Chain</span><span>Sonic</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-section-title">Your position</div>
+            <div class="detail-actions">
+              <div class="score-qualify yes">✦ Your score (82) qualifies for the +3% bonus. You earn 7% total per referral.</div>
+              <button class="detail-refer-btn">Get referral link →</button>
+              <div class="detail-copy-link" onclick="this.textContent='Copied!';setTimeout(()=>this.textContent='Copy pool link',1500)">Copy pool link</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FLOKI -->
+    <div class="pool-row-wrap">
+      <div class="pool-row" onclick="toggleRow(this)">
+        <div class="pool-token-cell">
+          <div class="pool-token-icon" style="background:rgba(234,179,8,0.1)">⚡</div>
+          <div>
+            <div class="pool-token-name">Floki</div>
+            <div class="pool-token-chain">FLOKI · Ethereum</div>
+          </div>
+        </div>
+        <div class="pool-cell-status"><span class="status-pill s-active">● Active</span></div>
+        <div class="pool-cell">$22,100</div>
+        <div class="ref-pct">5%<span class="ref-pct-bonus">+2% score bonus</span></div>
+        <div class="pool-cell">1%</div>
+        <div class="pool-cell" style="color:#c084fc">75+ score</div>
+        <div class="pool-chevron">▾</div>
+      </div>
+      <div class="pool-detail">
+        <div class="pool-detail-inner">
+          <div>
+            <div class="detail-section-title">Reward breakdown</div>
+            <div class="reward-rows">
+              <div class="reward-row"><div class="reward-row-label"><div class="reward-who"><span class="reward-who-dot dot-r"></span>You (referrer)</div><div class="reward-pct-val pct-r">5%</div></div><div class="reward-bar-track"><div class="reward-bar-fill fill-r" style="width:100%"></div></div></div>
+              <div class="reward-row"><div class="reward-row-label"><div class="reward-who"><span class="reward-who-dot dot-b"></span>Buyer gets</div><div class="reward-pct-val pct-b">1%</div></div><div class="reward-bar-track"><div class="reward-bar-fill fill-b" style="width:20%"></div></div></div>
+              <div class="reward-row"><div class="reward-row-label"><div class="reward-who"><span class="reward-who-dot dot-s"></span>Score bonus (75+)</div><div class="reward-pct-val pct-s">+2%</div></div><div class="reward-bar-track"><div class="reward-bar-fill fill-s" style="width:40%"></div></div></div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-section-title">Pool details</div>
+            <div class="detail-meta">
+              <div class="detail-meta-row"><span>Pool size</span><span>$22,100</span></div>
+              <div class="detail-meta-row"><span>Remaining</span><span>21 days</span></div>
+              <div class="detail-meta-row"><span>Total referred</span><span>410 wallets</span></div>
+              <div class="detail-meta-row"><span>Your referrals</span><span>2</span></div>
+              <div class="detail-meta-row"><span>Chain</span><span>Ethereum</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-section-title">Your position</div>
+            <div class="detail-actions">
+              <div class="score-qualify yes">✦ Your score (82) qualifies for the +2% bonus. You earn 7% total per referral.</div>
+              <button class="detail-refer-btn">Get referral link →</button>
+              <div class="detail-copy-link" onclick="this.textContent='Copied!';setTimeout(()=>this.textContent='Copy pool link',1500)">Copy pool link</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function toggleRow(rowEl){
+  const wrap=rowEl.closest('.pool-row-wrap');
+  const detail=wrap.querySelector('.pool-detail');
+  const chevron=rowEl.querySelector('.pool-chevron');
+  const isOpen=detail.classList.contains('open');
+  document.querySelectorAll('.pool-detail.open').forEach(d=>d.classList.remove('open'));
+  document.querySelectorAll('.pool-chevron.open').forEach(c=>c.classList.remove('open'));
+  document.querySelectorAll('.pool-row.expanded').forEach(r=>r.classList.remove('expanded'));
+  if(!isOpen){detail.classList.add('open');chevron.classList.add('open');rowEl.classList.add('expanded')}
+}
+function setPF(el){
+  el.closest('.pool-filter-group').querySelectorAll('.pool-filter').forEach(f=>f.classList.remove('active'));
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>

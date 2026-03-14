@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attribution Leaderboard — by MintWare</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#f5f5f0;color:#1a1a2e}
+.lb-wrap{background:#fff;min-height:100vh}
+
+.lb-header{padding:24px 28px 0;border-bottom:1px solid #eeeee8}
+.lb-title{font-size:22px;font-weight:700;color:#1a1a2e;letter-spacing:-0.5px;margin-bottom:4px}
+.lb-sub{font-size:13px;color:#aaa;margin-bottom:16px}
+
+.lb-tabs{display:flex;gap:0;border-bottom:1px solid #eeeee8;margin:0 -28px;padding:0 28px}
+.lb-tab{padding:10px 18px;font-size:13px;font-weight:500;color:#aaa;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:all 0.15s}
+.lb-tab:hover{color:#1a1a2e}
+.lb-tab.active{color:#0052FF;border-bottom-color:#0052FF;font-weight:600}
+
+.lb-filters{display:flex;align-items:center;gap:8px;padding:16px 28px;border-bottom:1px solid #eeeee8;flex-wrap:wrap}
+.lb-filter{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid #eeeee8;color:#888;background:#fff;transition:all 0.15s}
+.lb-filter:hover{border-color:#0052FF;color:#0052FF}
+.lb-filter.active{background:#0052FF;color:#fff;border-color:#0052FF}
+.lb-filter-label{font-size:12px;color:#ccc;margin-right:4px}
+
+.lb-body{padding:0 28px 28px}
+
+.lb-podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:20px 0;align-items:end}
+.lb-pod{border-radius:12px;padding:16px;text-align:center;cursor:pointer;transition:all 0.15s;border:1px solid #eeeee8}
+.lb-pod:hover{transform:translateY(-2px)}
+.lb-pod-1{background:#fffbf0;border-color:#fde68a;order:2}
+.lb-pod-2{background:#f8f8f8;border-color:#e5e5e5;order:1}
+.lb-pod-3{background:#fff8f5;border-color:#fed7aa;order:3}
+.lb-pod-rank{font-size:20px;margin-bottom:6px}
+.lb-pod-avatar{width:44px;height:44px;border-radius:12px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.lb-pod-name{font-size:13px;font-weight:700;color:#1a1a2e;margin-bottom:2px}
+.lb-pod-handle{font-size:10px;color:#0052FF;font-family:'DM Mono',monospace;margin-bottom:8px}
+.lb-pod-score{font-size:22px;font-weight:700;font-family:'DM Mono',monospace;color:#1a1a2e}
+.lb-pod-score-label{font-size:10px;color:#aaa;margin-top:1px}
+.lb-pod-earnings{font-size:11px;color:#16a34a;font-weight:600;margin-top:6px;background:#f0fdf4;padding:3px 8px;border-radius:20px;display:inline-block}
+
+.lb-table{width:100%;margin-top:4px}
+.lb-row{display:grid;grid-template-columns:44px 1fr 80px 100px 90px 80px;gap:0;align-items:center;padding:10px 0;border-bottom:1px solid #f5f5f0;cursor:pointer;transition:background 0.1s}
+.lb-row:hover{background:#fafaf8;margin:0 -28px;padding:10px 28px}
+.lb-row.my-row{background:#f0f4ff;margin:0 -28px;padding:10px 28px;border-left:2px solid #0052FF}
+.lb-col-rank{font-size:13px;font-weight:700;color:#aaa;font-family:'DM Mono',monospace;text-align:center}
+.lb-col-rank.top3{color:#1a1a2e}
+.lb-col-identity{display:flex;align-items:center;gap:10px}
+.lb-row-avatar{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.lb-row-name{font-size:13px;font-weight:600;color:#1a1a2e}
+.lb-row-handle{font-size:10px;color:#0052FF;font-family:'DM Mono',monospace}
+.lb-col-score{font-size:14px;font-weight:700;color:#0052FF;font-family:'DM Mono',monospace;text-align:right}
+.lb-col-earnings{font-size:13px;font-weight:600;color:#16a34a;text-align:right}
+.lb-col-refs{font-size:13px;color:#666;text-align:right}
+.lb-col-change{font-size:12px;font-weight:600;text-align:right}
+.up{color:#16a34a}
+.down{color:#dc2626}
+.same{color:#aaa}
+
+.lb-table-header{display:grid;grid-template-columns:44px 1fr 80px 100px 90px 80px;gap:0;padding:10px 0 6px;border-bottom:1px solid #eeeee8}
+.lb-table-header div{font-size:11px;font-weight:600;color:#bbb;text-align:right}
+.lb-table-header div:first-child{text-align:center}
+.lb-table-header div:nth-child(2){text-align:left}
+
+.lb-your-rank{background:#f0f4ff;border:1px solid #d0deff;border-radius:10px;padding:12px 16px;margin:16px 0 4px;display:flex;align-items:center;gap:16px}
+.lb-yr-label{font-size:11px;color:#6b9fff;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.lb-yr-rank{font-size:24px;font-weight:700;color:#0052FF;font-family:'DM Mono',monospace}
+.lb-yr-sub{font-size:11px;color:#aaa;margin-top:1px}
+.lb-yr-score{margin-left:auto;text-align:right}
+</style>
+</head>
+<body>
+<div class="lb-wrap">
+  <div class="lb-header">
+    <div class="lb-title">Attribution leaderboard</div>
+    <div class="lb-sub">Updated every 10 minutes · 24,817 wallets scored</div>
+    <div class="lb-tabs">
+      <div class="lb-tab active" onclick="setTab(this)">Top score</div>
+      <div class="lb-tab" onclick="setTab(this)">Top earners</div>
+      <div class="lb-tab" onclick="setTab(this)">Top referrers</div>
+      <div class="lb-tab" onclick="setTab(this)">Rising fast</div>
+    </div>
+  </div>
+
+  <div class="lb-filters">
+    <span class="lb-filter-label">Chain</span>
+    <div class="lb-filter active" onclick="setFilter(this)">All chains</div>
+    <div class="lb-filter" onclick="setFilter(this)">Base</div>
+    <div class="lb-filter" onclick="setFilter(this)">Ethereum</div>
+    <div class="lb-filter" onclick="setFilter(this)">Arbitrum</div>
+    <div class="lb-filter" onclick="setFilter(this)">Sonic</div>
+  </div>
+
+  <div class="lb-body">
+    <div class="lb-your-rank">
+      <div>
+        <div class="lb-yr-label">Your rank</div>
+        <div class="lb-yr-rank">#847</div>
+        <div class="lb-yr-sub">Top 3.4% · up 12 spots this week</div>
+      </div>
+      <div style="flex:1;padding:0 20px">
+        <div style="height:4px;background:#dce8ff;border-radius:2px;overflow:hidden">
+          <div style="width:96.6%;height:100%;background:#0052FF;border-radius:2px"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px">
+          <span style="font-size:10px;color:#aaa">#1</span>
+          <span style="font-size:10px;color:#0052FF;font-weight:600">#847 (you)</span>
+          <span style="font-size:10px;color:#aaa">#24,817</span>
+        </div>
+      </div>
+      <div class="lb-yr-score">
+        <div style="font-size:11px;color:#6b9fff;font-weight:600">Score</div>
+        <div style="font-size:20px;font-weight:700;color:#0052FF;font-family:'DM Mono',monospace">82</div>
+      </div>
+    </div>
+
+    <div class="lb-podium">
+      <div class="lb-pod lb-pod-2">
+        <div class="lb-pod-rank">🥈</div>
+        <div class="lb-pod-avatar" style="background:#f0f0ec">🦊</div>
+        <div class="lb-pod-name">defi_fox</div>
+        <div class="lb-pod-handle">foxvault.mintware</div>
+        <div class="lb-pod-score">97</div>
+        <div class="lb-pod-score-label">score</div>
+        <div class="lb-pod-earnings">$8,420 earned</div>
+      </div>
+      <div class="lb-pod lb-pod-1">
+        <div class="lb-pod-rank">🥇</div>
+        <div class="lb-pod-avatar" style="background:#fff0e8">🐉</div>
+        <div class="lb-pod-name">0xdragon</div>
+        <div class="lb-pod-handle">dragon.mintware</div>
+        <div class="lb-pod-score">99</div>
+        <div class="lb-pod-score-label">score</div>
+        <div class="lb-pod-earnings">$14,220 earned</div>
+      </div>
+      <div class="lb-pod lb-pod-3">
+        <div class="lb-pod-rank">🥉</div>
+        <div class="lb-pod-avatar" style="background:#f0f8ff">🤖</div>
+        <div class="lb-pod-name">lpmaxi</div>
+        <div class="lb-pod-handle">lpmaxi.mintware</div>
+        <div class="lb-pod-score">96</div>
+        <div class="lb-pod-score-label">score</div>
+        <div class="lb-pod-earnings">$7,180 earned</div>
+      </div>
+    </div>
+
+    <div class="lb-table-header">
+      <div>#</div>
+      <div>Wallet</div>
+      <div>Score</div>
+      <div>Earnings</div>
+      <div>Referrals</div>
+      <div>7d change</div>
+    </div>
+
+    <div class="lb-table">
+      <div class="lb-row">
+        <div class="lb-col-rank top3">4</div>
+        <div class="lb-col-identity"><div class="lb-row-avatar" style="background:#f5f0ff">🧙</div><div><div class="lb-row-name">cryptowitch</div><div class="lb-row-handle">witch.mintware</div></div></div>
+        <div class="lb-col-score">95</div><div class="lb-col-earnings">$6,844</div><div class="lb-col-refs">41</div><div class="lb-col-change up">+0</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-col-rank top3">5</div>
+        <div class="lb-col-identity"><div class="lb-row-avatar" style="background:#f0fff4">🌿</div><div><div class="lb-row-name">yieldfarmer</div><div class="lb-row-handle">yield.mintware</div></div></div>
+        <div class="lb-col-score">94</div><div class="lb-col-earnings">$5,210</div><div class="lb-col-refs">28</div><div class="lb-col-change up">▲ 2</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-col-rank">6</div>
+        <div class="lb-col-identity"><div class="lb-row-avatar" style="background:#fff0f0">🔴</div><div><div class="lb-row-name">redpool</div><div class="lb-row-handle">redpool.mintware</div></div></div>
+        <div class="lb-col-score">93</div><div class="lb-col-earnings">$4,980</div><div class="lb-col-refs">19</div><div class="lb-col-change down">▼ 1</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-col-rank">7</div>
+        <div class="lb-col-identity"><div class="lb-row-avatar" style="background:#f0f4ff">⚡</div><div><div class="lb-row-name">flashlp</div><div class="lb-row-handle">flash.mintware</div></div></div>
+        <div class="lb-col-score">92</div><div class="lb-col-earnings">$4,102</div><div class="lb-col-refs">33</div><div class="lb-col-change up">▲ 5</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-col-rank">8</div>
+        <div class="lb-col-identity"><div class="lb-row-avatar" style="background:#fffbf0">🌊</div><div><div class="lb-row-name">wavevault</div><div class="lb-row-handle">wave.mintware</div></div></div>
+        <div class="lb-col-score">91</div><div class="lb-col-earnings">$3,870</div><div class="lb-col-refs">22</div><div class="lb-col-change same">—</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-col-rank">9</div>
+        <div class="lb-col-identity"><div class="lb-row-avatar" style="background:#f8f0ff">🦋</div><div><div class="lb-row-name">metamorphic</div><div class="lb-row-handle">meta.mintware</div></div></div>
+        <div class="lb-col-score">90</div><div class="lb-col-earnings">$3,540</div><div class="lb-col-refs">17</div><div class="lb-col-change up">▲ 3</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-col-rank">10</div>
+        <div class="lb-col-identity"><div class="lb-row-avatar" style="background:#f0f8ff">🐋</div><div><div class="lb-row-name">whalewatch</div><div class="lb-row-handle">whale.mintware</div></div></div>
+        <div class="lb-col-score">89</div><div class="lb-col-earnings">$3,210</div><div class="lb-col-refs">11</div><div class="lb-col-change down">▼ 2</div>
+      </div>
+
+      <div style="padding:10px 0;text-align:center;font-size:12px;color:#ccc;border-bottom:1px solid #f5f5f0;letter-spacing:2px">· · ·</div>
+
+      <div class="lb-row my-row">
+        <div class="lb-col-rank top3">847</div>
+        <div class="lb-col-identity"><div class="lb-row-avatar" style="background:#e8f0ff">🧙</div><div><div class="lb-row-name">nmstarchild <span style="font-size:10px;background:#e8f0ff;color:#0052FF;padding:1px 6px;border-radius:10px;font-weight:600">you</span></div><div class="lb-row-handle">vaultking.mintware</div></div></div>
+        <div class="lb-col-score">82</div><div class="lb-col-earnings">$2,760</div><div class="lb-col-refs">23</div><div class="lb-col-change up">▲ 12</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-col-rank">848</div>
+        <div class="lb-col-identity"><div class="lb-row-avatar" style="background:#f5f5f0">🎯</div><div><div class="lb-row-name">precisionlp</div><div class="lb-row-handle">0xprec…4a21</div></div></div>
+        <div class="lb-col-score">82</div><div class="lb-col-earnings">$2,740</div><div class="lb-col-refs">18</div><div class="lb-col-change same">—</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-col-rank">849</div>
+        <div class="lb-col-identity"><div class="lb-row-avatar" style="background:#fff8f0">🔥</div><div><div class="lb-row-name">hotstreak</div><div class="lb-row-handle">0xhot…9f33</div></div></div>
+        <div class="lb-col-score">81</div><div class="lb-col-earnings">$2,690</div><div class="lb-col-refs">14</div><div class="lb-col-change up">▲ 8</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function setTab(el){
+  document.querySelectorAll('.lb-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+function setFilter(el){
+  document.querySelectorAll('.lb-filter').forEach(f=>f.classList.remove('active'));
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>

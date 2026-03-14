@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attribution Profile — nmstarchild</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#f5f5f0;color:#1a1a2e}
+.p-wrap{background:#fff;min-height:100vh}
+
+.p-header{padding:24px 28px 0;border-bottom:1px solid #eeeee8}
+.p-identity{display:flex;align-items:flex-start;gap:20px;padding-bottom:16px}
+.p-avatar{width:80px;height:80px;border-radius:16px;background:#1a1a2e;display:flex;align-items:center;justify-content:center;font-size:34px;flex-shrink:0;position:relative;border:2px solid #eeeee8}
+.p-score-badge{position:absolute;bottom:0;right:0;background:#0052FF;color:#fff;font-family:'DM Mono',monospace;font-size:10px;font-weight:500;padding:3px 6px;border-radius:6px 0 0 0;letter-spacing:0}
+.p-info{flex:1;padding-top:2px}
+.p-name{font-size:21px;font-weight:700;color:#1a1a2e;letter-spacing:-0.5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.p-name-badge{font-size:10px;font-weight:600;background:#e8f0ff;color:#0052FF;padding:3px 8px;border-radius:20px;letter-spacing:0.3px;white-space:nowrap}
+.p-addr{font-family:'DM Mono',monospace;font-size:11px;color:#aaa;margin:4px 0 10px;display:flex;align-items:center;gap:6px}
+.p-addr-copy{background:#f0f0ec;border-radius:3px;padding:1px 5px;font-size:10px;cursor:pointer;color:#888}
+.p-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.p-meta-pill{background:#f5f5f0;border-radius:6px;padding:3px 9px;font-size:11px;color:#666;display:flex;align-items:center;gap:4px}
+
+.p-value-block{text-align:right;min-width:170px;padding-top:2px}
+.p-value-num{font-size:26px;font-weight:700;color:#1a1a2e;letter-spacing:-1px}
+.p-value-change{font-size:12px;font-weight:600;color:#dc2626;margin-top:2px}
+.p-sparkline{margin-top:6px;opacity:0.55}
+
+.p-stats{display:flex;align-items:stretch;gap:0;border-top:1px solid #eeeee8;flex-wrap:nowrap;overflow-x:auto}
+.p-stat{display:flex;flex-direction:column;gap:2px;padding:12px 16px;border-right:1px solid #eeeee8;flex-shrink:0}
+.p-stat:last-child{border-right:none}
+.p-stat-label{font-size:11px;color:#bbb;white-space:nowrap}
+.p-stat-val{font-size:14px;font-weight:600;color:#1a1a2e;white-space:nowrap}
+
+.p-stat-earnings{background:#f0fdf4;border-right:1px solid #eeeee8;padding:12px 18px;display:flex;flex-direction:column;gap:2px;flex-shrink:0;border-top:2px solid #16a34a}
+.p-stat-earnings .p-stat-label{color:#16a34a}
+.p-stat-earnings .p-stat-val{font-size:17px;color:#14532d;font-family:'DM Mono',monospace;font-weight:600}
+.p-stat-earnings .p-stat-sub{font-size:10px;color:#16a34a;margin-top:1px}
+
+.p-score-stat{background:#f0f4ff;border-top:2px solid #0052FF;padding:12px 16px;display:flex;flex-direction:column;gap:2px;flex-shrink:0;border-right:1px solid #eeeee8}
+.p-score-stat .p-stat-label{color:#6b9fff}
+.p-score-stat .p-stat-val{color:#0052FF;font-size:15px;font-family:'DM Mono',monospace}
+
+.p-follow-btn{background:#0052FF;color:#fff;border:none;padding:8px 22px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;margin:auto 16px auto auto;flex-shrink:0}
+.p-follow-btn:hover{background:#0040cc}
+
+.p-earnings-panel{border:1px solid #bbf7d0;border-radius:12px;background:#f0fdf4;padding:16px 18px;margin-bottom:18px}
+.p-earnings-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.p-earnings-title{font-size:11px;font-weight:600;color:#16a34a;letter-spacing:1px;text-transform:uppercase}
+.p-earnings-total{font-size:28px;font-weight:700;color:#14532d;font-family:'DM Mono',monospace;letter-spacing:-1px}
+.p-earnings-period{font-size:11px;color:#16a34a;margin-top:2px}
+.p-earnings-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.p-earning-type{background:#fff;border:1px solid #bbf7d0;border-radius:8px;padding:12px 14px}
+.p-earning-type-label{font-size:11px;color:#aaa;margin-bottom:4px}
+.p-earning-type-val{font-size:15px;font-weight:700;color:#1a1a2e;font-family:'DM Mono',monospace}
+.p-earning-type-sub{font-size:10px;color:#bbb;margin-top:2px}
+.p-earning-bar{height:3px;background:#bbf7d0;border-radius:2px;overflow:hidden;margin-top:8px}
+.p-earning-bar-fill{height:100%;background:#16a34a;border-radius:2px}
+
+.p-tabs{display:flex;gap:0;border-bottom:1px solid #eeeee8;margin:0 28px}
+.p-tab{padding:12px 20px;font-size:14px;font-weight:500;color:#aaa;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s}
+.p-tab:hover{color:#1a1a2e}
+.p-tab.active{color:#0052FF;border-bottom-color:#0052FF;font-weight:600}
+
+.p-body{padding:20px 28px}
+
+.p-score-panel{border:1px solid #d0deff;border-radius:12px;background:#f7f9ff;padding:16px 18px;margin-bottom:18px}
+.p-score-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.p-score-panel-title{font-size:11px;font-weight:600;color:#0052FF;letter-spacing:1px;text-transform:uppercase}
+.p-score-tier{font-size:11px;color:#fff;background:#0052FF;padding:3px 10px;border-radius:20px;font-weight:600}
+.p-score-big{font-size:38px;font-weight:700;color:#0052FF;font-family:'DM Mono',monospace;letter-spacing:-1px;line-height:1}
+.p-score-dims{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.p-dim{display:flex;flex-direction:column;gap:4px}
+.p-dim-row{display:flex;justify-content:space-between}
+.p-dim-name{font-size:11px;color:#888}
+.p-dim-num{font-size:11px;font-weight:600;color:#0052FF;font-family:'DM Mono',monospace}
+.p-dim-bar{height:3px;background:#dce8ff;border-radius:2px;overflow:hidden}
+.p-dim-fill{height:100%;background:#0052FF;border-radius:2px}
+
+.p-chains-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-bottom:16px;border:1px solid #eeeee8;border-radius:12px;overflow:hidden}
+.p-chain{display:flex;align-items:center;gap:8px;padding:12px 12px;border-right:1px solid #eeeee8;cursor:pointer;transition:background 0.1s}
+.p-chain:hover{background:#f9f9f6}
+.p-chain:last-child{border-right:none}
+.p-chain-dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;font-weight:700}
+.p-chain-name{font-size:12px;font-weight:600;color:#1a1a2e}
+.p-chain-val{font-size:11px;color:#aaa}
+
+.p-protocols-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.p-proto-card{border:1px solid #eeeee8;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all 0.15s}
+.p-proto-card:hover{border-color:#0052FF;background:#f9fbff}
+.p-proto-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.p-proto-name{font-size:12px;font-weight:500;color:#888}
+.p-proto-val{font-size:14px;font-weight:700;color:#1a1a2e}
+
+.p-table{border:1px solid #eeeee8;border-radius:10px;overflow:hidden}
+.p-table-header{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;background:#fafaf8;border-bottom:1px solid #eeeee8}
+.p-table-header div{padding:9px 14px;font-size:11px;font-weight:600;color:#bbb}
+.p-table-header div:not(:first-child){text-align:right}
+.p-table-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;border-top:1px solid #eeeee8}
+.p-table-row div{padding:10px 14px;font-size:13px;color:#666}
+.p-table-row div:first-child{display:flex;align-items:center;gap:8px;font-weight:500;color:#1a1a2e}
+.p-table-row div:not(:first-child){text-align:right}
+.p-table-row div:last-child{font-weight:600;color:#1a1a2e}
+.p-tok-icon{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.p-section-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid #eeeee8;margin-bottom:8px}
+.p-section-label{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
+.p-section-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px}
+</style>
+</head>
+<body>
+<div class="p-wrap">
+  <div class="p-header">
+    <div class="p-identity">
+      <div class="p-avatar">🧙<div class="p-score-badge">82</div></div>
+      <div class="p-info">
+        <div class="p-name">nmstarchild<span class="p-name-badge">vaultking.mintware</span></div>
+        <div class="p-addr">0xf7b1…e2d6<span class="p-addr-copy">copy</span></div>
+        <div class="p-meta">
+          <span class="p-meta-pill">🏆 30</span>
+          <span class="p-meta-pill">📅 3045 days</span>
+          <span class="p-meta-pill">🔗 23 referrals</span>
+          <span class="p-meta-pill" style="background:#e8f0ff;color:#0052FF">Builder tier</span>
+        </div>
+      </div>
+      <div class="p-value-block">
+        <div class="p-value-num">$52,319</div>
+        <div class="p-value-change">▼ 2.26%</div>
+        <svg class="p-sparkline" width="120" height="28" viewBox="0 0 120 28">
+          <polyline points="0,22 10,18 20,20 30,12 40,14 50,8 60,12 70,6 80,10 90,5 100,9 110,7 120,10" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+    <div class="p-stats">
+      <div class="p-stat-earnings">
+        <span class="p-stat-label">Total earnings</span>
+        <span class="p-stat-val">$2,760.24</span>
+        <span class="p-stat-sub">+$184 this month</span>
+      </div>
+      <div class="p-stat"><span class="p-stat-label">TVF</span><span class="p-stat-val">$380.3M</span></div>
+      <div class="p-stat"><span class="p-stat-label">Followers</span><span class="p-stat-val">14.6K</span></div>
+      <div class="p-stat"><span class="p-stat-label">Following</span><span class="p-stat-val">763</span></div>
+      <div class="p-stat"><span class="p-stat-label">On-chain PnL</span><span class="p-stat-val" style="color:#16a34a">+$41.2K</span></div>
+      <div class="p-stat"><span class="p-stat-label">LP positions</span><span class="p-stat-val">14</span></div>
+      <div class="p-score-stat"><span class="p-stat-label">Attribution score</span><span class="p-stat-val">82 / 100</span></div>
+      <button class="p-follow-btn">+ Follow</button>
+    </div>
+  </div>
+
+  <div class="p-tabs">
+    <div class="p-tab active">Portfolio</div>
+    <div class="p-tab">Transactions</div>
+    <div class="p-tab">Score</div>
+    <div class="p-tab">Badge</div>
+  </div>
+
+  <div class="p-body">
+    <div class="p-earnings-panel">
+      <div class="p-earnings-header">
+        <div>
+          <div class="p-earnings-title">Attribution earnings</div>
+          <div class="p-earnings-total">$2,760.24</div>
+          <div class="p-earnings-period">All time · updated 12 mins ago</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;color:#16a34a;margin-bottom:4px">This month</div>
+          <div style="font-size:20px;font-weight:700;color:#14532d;font-family:'DM Mono',monospace">+$184.50</div>
+          <div style="font-size:10px;color:#16a34a;margin-top:2px">score weight: 82/100</div>
+        </div>
+      </div>
+      <div class="p-earnings-grid">
+        <div class="p-earning-type">
+          <div class="p-earning-type-label">Vault fees</div>
+          <div class="p-earning-type-val">$1,842.10</div>
+          <div class="p-earning-type-sub">From LP positions</div>
+          <div class="p-earning-bar"><div class="p-earning-bar-fill" style="width:67%"></div></div>
+        </div>
+        <div class="p-earning-type">
+          <div class="p-earning-type-label">Referral rewards</div>
+          <div class="p-earning-type-val">$714.88</div>
+          <div class="p-earning-type-sub">23 wallets referred</div>
+          <div class="p-earning-bar"><div class="p-earning-bar-fill" style="width:26%"></div></div>
+        </div>
+        <div class="p-earning-type">
+          <div class="p-earning-type-label">Reward pools</div>
+          <div class="p-earning-type-val">$203.26</div>
+          <div class="p-earning-type-sub">4 token distributions</div>
+          <div class="p-earning-bar"><div class="p-earning-bar-fill" style="width:7%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-score-panel">
+      <div class="p-score-panel-header">
+        <span class="p-score-panel-title">Attribution score</span>
+        <span class="p-score-tier">Builder tier</span>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:20px">
+        <div>
+          <div class="p-score-big">82</div>
+          <div style="font-size:11px;color:#aaa;margin-top:4px;font-family:'DM Mono',monospace">top 5% of wallets</div>
+        </div>
+        <div style="flex:1">
+          <div class="p-score-dims">
+            <div class="p-dim"><div class="p-dim-row"><span class="p-dim-name">LP behavior</span><span class="p-dim-num">91</span></div><div class="p-dim-bar"><div class="p-dim-fill" style="width:91%"></div></div></div>
+            <div class="p-dim"><div class="p-dim-row"><span class="p-dim-name">DeFi competence</span><span class="p-dim-num">85</span></div><div class="p-dim-bar"><div class="p-dim-fill" style="width:85%"></div></div></div>
+            <div class="p-dim"><div class="p-dim-row"><span class="p-dim-name">Wallet longevity</span><span class="p-dim-num">78</span></div><div class="p-dim-bar"><div class="p-dim-fill" style="width:78%"></div></div></div>
+            <div class="p-dim"><div class="p-dim-row"><span class="p-dim-name">Network & referral</span><span class="p-dim-num">64</span></div><div class="p-dim-bar"><div class="p-dim-fill" style="width:64%"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-chains-grid">
+      <div class="p-chain"><div class="p-chain-dot" style="background:#e8f0ff;color:#0052FF">B</div><div><div class="p-chain-name">Base</div><div class="p-chain-val">$34,737 · 66%</div></div></div>
+      <div class="p-chain"><div class="p-chain-dot" style="background:#fff4e8;color:#f97316">S</div><div><div class="p-chain-name">Sonic</div><div class="p-chain-val">$11,945 · 23%</div></div></div>
+      <div class="p-chain"><div class="p-chain-dot" style="background:#eef2ff;color:#6366f1">Ξ</div><div><div class="p-chain-name">Ethereum</div><div class="p-chain-val">$2,456 · 5%</div></div></div>
+      <div class="p-chain"><div class="p-chain-dot" style="background:#f0fdf4;color:#16a34a">A</div><div><div class="p-chain-name">Arbitrum</div><div class="p-chain-val">$1,044 · 2%</div></div></div>
+      <div class="p-chain"><div class="p-chain-dot" style="background:#fdf4ff;color:#a855f7">O</div><div><div class="p-chain-name">OP</div><div class="p-chain-val">$933 · 2%</div></div></div>
+    </div>
+
+    <div class="p-protocols-row">
+      <div class="p-proto-card"><div class="p-proto-icon" style="background:#fff0f6">🦄</div><div><div class="p-proto-name">Uniswap V4</div><div class="p-proto-val">$23,183</div></div></div>
+      <div class="p-proto-card"><div class="p-proto-icon" style="background:#f0f4ff">🥞</div><div><div class="p-proto-name">PancakeSwap V3</div><div class="p-proto-val">$10,842</div></div></div>
+      <div class="p-proto-card"><div class="p-proto-icon" style="background:#f0fdf4;color:#16a34a;font-weight:700;font-size:13px">A</div><div><div class="p-proto-name">Aave V3</div><div class="p-proto-val">$602</div></div></div>
+    </div>
+
+    <div class="p-section-row">
+      <div class="p-section-label"><div class="p-section-icon" style="background:#ffe8f0">👛</div>Wallet</div>
+      <div style="font-size:13px;font-weight:600">$602</div>
+    </div>
+
+    <div class="p-table">
+      <div class="p-table-header"><div>Token</div><div>Price</div><div>Amount</div><div>USD Value</div></div>
+      <div class="p-table-row">
+        <div><span class="p-tok-icon" style="background:#eef2ff;color:#6366f1">Ξ</span>ETH</div>
+        <div>$1,978</div><div>0.29</div><div>$574</div>
+      </div>
+      <div class="p-table-row">
+        <div><span class="p-tok-icon" style="background:#e8f0ff;color:#0052FF;font-size:9px">U</span>USDC</div>
+        <div>$1.00</div><div>28</div><div>$28</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.p-tab').forEach(t=>{
+  t.onclick=()=>{
+    document.querySelectorAll('.p-tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+  }
+});
+</script>
+</body>
+</html>

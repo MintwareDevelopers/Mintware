@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mintware — Your on-chain reputation, finally working for you</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#0052FF;
+  --blue-dim:rgba(0,82,255,0.07);
+  --blue-mid:rgba(0,82,255,0.14);
+  --ink:#1A1A2E;
+  --ink-2:#3A3C52;
+  --ink-3:#8A8C9E;
+  --surface:#F7F6FF;
+  --white:#ffffff;
+  --green:#16a34a;
+  --green-bg:#f0fdf4;
+  --border:rgba(26,26,46,0.08);
+  --border-strong:rgba(26,26,46,0.14);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  background:var(--white);
+  color:var(--ink);
+  overflow-x:hidden;
+}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 52px;
+  background:rgba(255,255,255,0.9);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{
+  font-family:Georgia,serif;
+  font-size:20px;font-weight:700;
+  color:var(--ink);letter-spacing:-0.3px;
+  display:flex;align-items:center;gap:9px;
+}
+.nav-logo-mark{
+  width:24px;height:24px;border-radius:6px;
+  background:var(--blue);
+  display:flex;align-items:center;justify-content:center;
+}
+.nav-logo-mark svg{width:14px;height:14px;fill:white}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-links a{
+  font-size:14px;font-weight:500;color:var(--ink-3);
+  text-decoration:none;transition:color 0.15s;
+}
+.nav-links a:hover{color:var(--ink)}
+.nav-cta{
+  background:var(--ink);color:var(--white);
+  border:none;padding:9px 22px;border-radius:20px;
+  font-size:13px;font-weight:600;cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  letter-spacing:0.1px;
+  transition:background 0.15s;
+}
+.nav-cta:hover{background:var(--blue)}
+
+/* HERO */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:130px 52px 90px;
+  position:relative;overflow:hidden;
+  text-align:center;
+  background:var(--surface);
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(0,82,255,0.06) 0%, transparent 65%),
+    radial-gradient(ellipse 30% 20% at 85% 85%, rgba(0,82,255,0.04) 0%, transparent 60%);
+  pointer-events:none;
+}
+.hero-grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(26,26,46,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26,26,46,0.04) 1px, transparent 1px);
+  background-size:56px 56px;
+  pointer-events:none;
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+.hero-badge{
+  display:inline-flex;align-items:center;gap:7px;
+  background:var(--white);border:1px solid var(--border-strong);
+  border-radius:20px;padding:5px 14px;
+  font-size:12px;font-weight:600;color:var(--ink-2);
+  margin-bottom:32px;letter-spacing:0.2px;
+  animation:fadeUp 0.5s ease both;
+  box-shadow:0 1px 4px rgba(26,26,46,0.06);
+}
+.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);animation:pulse 2s ease infinite}
+
+.hero-h1{
+  font-family:Georgia,serif;
+  font-size:clamp(40px,5.5vw,76px);
+  font-weight:700;
+  line-height:1.06;
+  letter-spacing:-1.5px;
+  color:var(--ink);
+  max-width:820px;
+  margin:0 auto 6px;
+  animation:fadeUp 0.5s 0.08s ease both;
+}
+.hero-h1 em{font-style:normal;color:var(--blue)}
+
+.hero-sub{
+  font-size:clamp(15px,1.8vw,19px);
+  font-weight:400;
+  color:var(--ink-3);
+  max-width:500px;
+  margin:18px auto 52px;
+  line-height:1.65;
+  animation:fadeUp 0.5s 0.16s ease both;
+}
+
+.hero-ctas{
+  display:flex;align-items:center;gap:12px;
+  justify-content:center;flex-wrap:wrap;
+  animation:fadeUp 0.5s 0.24s ease both;
+}
+.btn-people{
+  background:var(--blue);color:var(--white);
+  border:none;padding:15px 34px;border-radius:12px;
+  font-size:15px;font-weight:600;cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  transition:all 0.15s;
+  display:flex;align-items:center;gap:8px;
+}
+.btn-people:hover{background:#0040cc;transform:translateY(-1px)}
+.btn-teams{
+  background:var(--white);color:var(--ink);
+  border:1.5px solid var(--border-strong);
+  padding:15px 34px;border-radius:12px;
+  font-size:15px;font-weight:600;cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  transition:all 0.15s;
+  display:flex;align-items:center;gap:8px;
+}
+.btn-teams:hover{border-color:var(--ink);transform:translateY(-1px)}
+.btn-arrow{transition:transform 0.15s}
+.btn-people:hover .btn-arrow,.btn-teams:hover .btn-arrow{transform:translateX(3px)}
+
+.hero-stats{
+  display:flex;align-items:stretch;gap:0;
+  margin-top:68px;
+  border:1px solid var(--border-strong);
+  border-radius:14px;overflow:hidden;
+  background:var(--white);
+  box-shadow:0 2px 12px rgba(26,26,46,0.06);
+  animation:fadeUp 0.5s 0.32s ease both;
+}
+.hero-stat{
+  padding:18px 36px;border-right:1px solid var(--border);
+  text-align:center;
+}
+.hero-stat:last-child{border-right:none}
+.hero-stat-val{
+  font-family:Georgia,serif;
+  font-size:26px;font-weight:700;color:var(--ink);
+  letter-spacing:-0.5px;
+}
+.hero-stat-label{font-size:12px;color:var(--ink-3);margin-top:3px;font-weight:400}
+
+/* SECTION SHARED */
+section{padding:100px 52px}
+.section-badge{
+  font-size:11px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--blue);
+  margin-bottom:14px;display:block;
+}
+.section-h2{
+  font-family:Georgia,serif;
+  font-size:clamp(30px,3.5vw,48px);
+  font-weight:700;letter-spacing:-1px;
+  color:var(--ink);line-height:1.12;
+  margin-bottom:14px;
+}
+.section-sub{
+  font-size:16px;font-weight:400;color:var(--ink-3);
+  line-height:1.65;max-width:500px;
+}
+
+/* HOW IT WORKS */
+.how{background:var(--white);border-top:1px solid var(--border)}
+.how-inner{max-width:1080px;margin:0 auto}
+.how-header{text-align:center;margin-bottom:56px}
+.how-header .section-sub{margin:0 auto}
+.how-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.how-step{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;padding:32px;
+  transition:transform 0.2s,box-shadow 0.2s;
+}
+.how-step:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,82,255,0.07)}
+.how-step-num{
+  font-family:'DM Mono',monospace;
+  font-size:11px;font-weight:500;color:var(--blue);
+  background:var(--blue-dim);
+  padding:3px 10px;border-radius:20px;
+  display:inline-block;margin-bottom:20px;
+}
+.how-step-icon{font-size:28px;margin-bottom:14px;display:block}
+.how-step h3{
+  font-family:Georgia,serif;
+  font-size:19px;font-weight:700;color:var(--ink);
+  margin-bottom:10px;letter-spacing:-0.2px;
+}
+.how-step p{font-size:14px;color:var(--ink-3);line-height:1.65;font-weight:400}
+
+/* ATTRIBUTION */
+.attribution{background:var(--ink)}
+.attribution-inner{max-width:1080px;margin:0 auto}
+.attribution-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:80px;align-items:center;
+}
+.attribution .section-badge{color:rgba(247,246,255,0.35)}
+.attribution .section-h2{color:var(--surface)}
+.attribution .section-sub{color:rgba(247,246,255,0.45)}
+
+.attr-pillars{display:flex;flex-direction:column;gap:12px;margin-top:36px}
+.attr-pillar{
+  background:rgba(247,246,255,0.04);
+  border:1px solid rgba(247,246,255,0.07);
+  border-radius:10px;padding:16px 20px;
+  display:flex;align-items:center;gap:14px;
+  transition:background 0.15s;cursor:pointer;
+}
+.attr-pillar:hover{background:rgba(247,246,255,0.07)}
+.attr-pillar-icon{
+  width:38px;height:38px;border-radius:9px;
+  background:rgba(0,82,255,0.18);
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;flex-shrink:0;
+}
+.attr-pillar-name{
+  font-family:Georgia,serif;
+  font-size:15px;font-weight:700;color:var(--surface);
+  margin-bottom:2px;
+}
+.attr-pillar-desc{font-size:12px;color:rgba(247,246,255,0.38);font-weight:400}
+
+.score-visual{
+  background:rgba(247,246,255,0.04);
+  border:1px solid rgba(247,246,255,0.08);
+  border-radius:18px;padding:30px;
+}
+.score-visual-header{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  margin-bottom:22px;
+}
+.score-num{
+  font-family:Georgia,serif;
+  font-size:60px;font-weight:700;color:var(--blue);
+  letter-spacing:-2px;line-height:1;
+}
+.score-tier{
+  font-size:11px;font-weight:600;
+  background:var(--blue-mid);color:#6b9fff;
+  padding:4px 12px;border-radius:20px;
+  border:1px solid rgba(0,82,255,0.25);
+  margin-top:4px;
+}
+.score-bars{display:flex;flex-direction:column;gap:11px}
+.score-bar-row{display:flex;flex-direction:column;gap:5px}
+.score-bar-label{
+  display:flex;justify-content:space-between;
+  font-size:12px;color:rgba(247,246,255,0.35);
+}
+.score-bar-label span:last-child{color:var(--blue);font-family:'DM Mono',monospace}
+.score-bar-track{height:3px;background:rgba(247,246,255,0.07);border-radius:2px;overflow:hidden}
+.score-bar-fill{height:100%;background:var(--blue);border-radius:2px}
+.score-earnings{
+  margin-top:22px;padding-top:18px;
+  border-top:1px solid rgba(247,246,255,0.06);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.score-earn-label{font-size:11px;color:rgba(247,246,255,0.3);margin-bottom:3px}
+.score-earn-val{
+  font-family:'DM Mono',monospace;
+  font-size:20px;font-weight:500;color:#4ade80;
+}
+
+/* TWO PATHS */
+.paths{background:var(--surface);border-top:1px solid var(--border)}
+.paths-inner{max-width:1080px;margin:0 auto}
+.paths-header{text-align:center;margin-bottom:56px}
+.paths-header .section-sub{margin:0 auto}
+.paths-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+
+.path-card{
+  border-radius:20px;padding:44px;
+  position:relative;overflow:hidden;
+  cursor:pointer;transition:transform 0.2s;
+}
+.path-card:hover{transform:translateY(-3px)}
+.path-people{background:var(--ink)}
+.path-teams{background:var(--white);border:1.5px solid var(--border-strong)}
+
+.path-label{
+  font-size:11px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;margin-bottom:20px;
+  display:flex;align-items:center;gap:7px;
+}
+.path-people .path-label{color:rgba(247,246,255,0.35)}
+.path-teams .path-label{color:var(--blue)}
+.path-label-dot{width:5px;height:5px;border-radius:50%}
+.path-people .path-label-dot{background:rgba(247,246,255,0.3)}
+.path-teams .path-label-dot{background:var(--blue)}
+
+.path-h3{
+  font-family:Georgia,serif;
+  font-size:30px;font-weight:700;letter-spacing:-0.8px;
+  line-height:1.12;margin-bottom:14px;
+}
+.path-people .path-h3{color:var(--surface)}
+.path-teams .path-h3{color:var(--ink)}
+
+.path-desc{
+  font-size:14px;font-weight:400;line-height:1.65;
+  margin-bottom:30px;
+}
+.path-people .path-desc{color:rgba(247,246,255,0.5)}
+.path-teams .path-desc{color:var(--ink-3)}
+
+.path-features{list-style:none;margin-bottom:36px;display:flex;flex-direction:column;gap:10px}
+.path-features li{
+  display:flex;align-items:center;gap:10px;
+  font-size:14px;font-weight:500;
+}
+.path-people .path-features li{color:rgba(247,246,255,0.8)}
+.path-teams .path-features li{color:var(--ink-2)}
+.path-check{
+  width:19px;height:19px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;flex-shrink:0;
+}
+.path-people .path-check{background:rgba(247,246,255,0.1);color:rgba(247,246,255,0.8)}
+.path-teams .path-check{background:var(--blue-dim);color:var(--blue)}
+
+.path-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:13px 26px;border-radius:10px;
+  font-size:14px;font-weight:600;cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  border:none;transition:all 0.15s;
+}
+.path-people .path-btn{background:var(--blue);color:var(--white)}
+.path-people .path-btn:hover{background:#0040cc}
+.path-teams .path-btn{background:var(--ink);color:var(--white)}
+.path-teams .path-btn:hover{background:#0052FF}
+
+.path-coming{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:500;color:var(--ink-3);
+  margin-top:10px;
+}
+.path-coming-dot{width:5px;height:5px;border-radius:50%;background:#f59e0b}
+
+/* FOOTER */
+footer{
+  background:var(--ink);
+  border-top:1px solid rgba(247,246,255,0.06);
+  padding:44px 52px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:20px;
+}
+.footer-logo{
+  font-family:Georgia,serif;
+  font-size:18px;font-weight:700;color:var(--surface);
+  display:flex;align-items:center;gap:8px;
+}
+.footer-logo-mark{
+  width:22px;height:22px;border-radius:5px;
+  background:var(--blue);
+  display:flex;align-items:center;justify-content:center;
+}
+.footer-links{display:flex;gap:24px;flex-wrap:wrap}
+.footer-links a{
+  font-size:13px;color:rgba(247,246,255,0.3);
+  text-decoration:none;transition:color 0.15s;
+}
+.footer-links a:hover{color:rgba(247,246,255,0.8)}
+.footer-copy{font-size:12px;color:rgba(247,246,255,0.18)}
+
+@media(max-width:768px){
+  nav{padding:14px 20px}
+  .nav-links{display:none}
+  section{padding:72px 20px}
+  .hero{padding:110px 20px 64px}
+  .hero-stats{flex-direction:column}
+  .hero-stat{border-right:none;border-bottom:1px solid var(--border)}
+  .hero-stat:last-child{border-bottom:none}
+  .how-steps,.paths-grid,.attribution-grid{grid-template-columns:1fr}
+  .attribution-grid{gap:40px}
+  footer{padding:32px 20px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-mark">
+      <svg viewBox="0 0 14 14"><path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5Z"/></svg>
+    </div>
+    Mintware
+  </div>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#attribution">Attribution</a>
+    <a href="#paths">Get started</a>
+  </div>
+  <button class="nav-cta">Connect wallet</button>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+
+  <div class="hero-badge">
+    <span class="hero-badge-dot"></span>
+    Now live — powered by Attribution
+  </div>
+
+  <h1 class="hero-h1">
+    Your on-chain reputation,<br>
+    <em>finally working for you</em>
+  </h1>
+
+  <p class="hero-sub">
+    Mintware is the platform where DeFi participants earn, compete, and grow — and where protocols deploy vaults and reward the people who actually show up.
+  </p>
+
+  <div class="hero-ctas">
+    <button class="btn-people" onclick="document.getElementById('paths').scrollIntoView({behavior:'smooth'})">
+      For people <span class="btn-arrow">→</span>
+    </button>
+    <button class="btn-teams" onclick="document.getElementById('paths').scrollIntoView({behavior:'smooth'})">
+      For teams <span class="btn-arrow">→</span>
+    </button>
+  </div>
+
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-val">24,817</div>
+      <div class="hero-stat-label">Wallets scored</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val">$4.2M</div>
+      <div class="hero-stat-label">Earnings distributed</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val">138K</div>
+      <div class="hero-stat-label">Referral connections</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val">100+</div>
+      <div class="hero-stat-label">Chains indexed</div>
+    </div>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <div class="how-inner">
+    <div class="how-header">
+      <span class="section-badge">How it works</span>
+      <h2 class="section-h2">Three steps to earning what you deserve</h2>
+      <p class="section-sub">Mintware uses Attribution to read your on-chain history and make sure rewards flow to the wallets that have earned them.</p>
+    </div>
+    <div class="how-steps">
+      <div class="how-step">
+        <span class="how-step-num">01</span>
+        <span class="how-step-icon">🔍</span>
+        <h3>Your history gets scored</h3>
+        <p>Attribution reads your full on-chain history — LP positions, DeFi activity, wallet age, referral network — and computes your score from 0 to 100.</p>
+      </div>
+      <div class="how-step">
+        <span class="how-step-num">02</span>
+        <span class="how-step-icon">⚡</span>
+        <h3>Score weights your rewards</h3>
+        <p>Inside Mintware vaults and reward pools, your Attribution score determines your share of fee distributions, referral rewards, and token team distributions.</p>
+      </div>
+      <div class="how-step">
+        <span class="how-step-num">03</span>
+        <span class="how-step-icon">📈</span>
+        <h3>Reputation compounds over time</h3>
+        <p>Every action you take on-chain improves your score. Refer strong wallets, provide liquidity, stay active — your reputation grows and your earnings follow.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="attribution" id="attribution">
+  <div class="attribution-inner">
+    <div class="attribution-grid">
+      <div>
+        <span class="section-badge">Powered by Attribution</span>
+        <h2 class="section-h2">The engine that makes it fair</h2>
+        <p class="section-sub">Attribution is the scoring protocol underneath Mintware. It reads wallets, outputs a trust score, and routes rewards proportionally. Open, on-chain, and composable.</p>
+        <div class="attr-pillars">
+          <div class="attr-pillar">
+            <div class="attr-pillar-icon">💧</div>
+            <div>
+              <div class="attr-pillar-name">LP behavior</div>
+              <div class="attr-pillar-desc">Position history, duration, volatility survival</div>
+            </div>
+          </div>
+          <div class="attr-pillar">
+            <div class="attr-pillar-icon">🧠</div>
+            <div>
+              <div class="attr-pillar-name">DeFi competence</div>
+              <div class="attr-pillar-desc">PnL outcomes, protocol breadth, liquidation history</div>
+            </div>
+          </div>
+          <div class="attr-pillar">
+            <div class="attr-pillar-icon">⏱</div>
+            <div>
+              <div class="attr-pillar-name">Wallet longevity</div>
+              <div class="attr-pillar-desc">Age, consistency, continuous activity over time</div>
+            </div>
+          </div>
+          <div class="attr-pillar">
+            <div class="attr-pillar-icon">🔗</div>
+            <div>
+              <div class="attr-pillar-name">Network & referrals</div>
+              <div class="attr-pillar-desc">Who you've brought in and the quality of their scores</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="score-visual">
+        <div class="score-visual-header">
+          <div>
+            <div style="font-size:11px;color:rgba(247,246,255,0.28);margin-bottom:4px;font-family:'DM Mono',monospace;letter-spacing:0.5px">ATTRIBUTION SCORE</div>
+            <div class="score-num">82</div>
+          </div>
+          <div class="score-tier">Builder tier</div>
+        </div>
+        <div class="score-bars">
+          <div class="score-bar-row">
+            <div class="score-bar-label"><span>LP behavior</span><span>91</span></div>
+            <div class="score-bar-track"><div class="score-bar-fill" style="width:91%"></div></div>
+          </div>
+          <div class="score-bar-row">
+            <div class="score-bar-label"><span>DeFi competence</span><span>85</span></div>
+            <div class="score-bar-track"><div class="score-bar-fill" style="width:85%"></div></div>
+          </div>
+          <div class="score-bar-row">
+            <div class="score-bar-label"><span>Wallet longevity</span><span>78</span></div>
+            <div class="score-bar-track"><div class="score-bar-fill" style="width:78%"></div></div>
+          </div>
+          <div class="score-bar-row">
+            <div class="score-bar-label"><span>Network & referral</span><span>64</span></div>
+            <div class="score-bar-track"><div class="score-bar-fill" style="width:64%"></div></div>
+          </div>
+          <div class="score-bar-row">
+            <div class="score-bar-label"><span>Mintware native</span><span>72</span></div>
+            <div class="score-bar-track"><div class="score-bar-fill" style="width:72%"></div></div>
+          </div>
+        </div>
+        <div class="score-earnings">
+          <div>
+            <div class="score-earn-label">Total earnings</div>
+            <div class="score-earn-val">$2,760.24</div>
+          </div>
+          <div style="text-align:right">
+            <div class="score-earn-label">This month</div>
+            <div style="font-family:'DM Mono',monospace;font-size:14px;color:rgba(247,246,255,0.4)">+$184.50</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="paths" id="paths">
+  <div class="paths-inner">
+    <div class="paths-header">
+      <span class="section-badge">Get started</span>
+      <h2 class="section-h2">Choose your path</h2>
+      <p class="section-sub">Whether you're building your reputation or building a protocol, Mintware has a home for you.</p>
+    </div>
+    <div class="paths-grid">
+      <div class="path-card path-people">
+        <div class="path-label">
+          <span class="path-label-dot"></span>
+          For people
+        </div>
+        <h3 class="path-h3">Build your identity.<br>Earn what you're worth.</h3>
+        <p class="path-desc">Connect your wallet, get your Attribution score, and start earning fees and rewards proportional to your on-chain contribution.</p>
+        <ul class="path-features">
+          <li><span class="path-check">✓</span>Attribution score & wallet profile</li>
+          <li><span class="path-check">✓</span>Global leaderboard — see where you rank</li>
+          <li><span class="path-check">✓</span>Referral rewards for wallets you bring in</li>
+          <li><span class="path-check">✓</span>Social LP vaults with score-weighted earnings</li>
+          <li><span class="path-check">✓</span>Earned wallet name (e.g. yourname.mintware)</li>
+        </ul>
+        <button class="path-btn">Enter app →</button>
+      </div>
+
+      <div class="path-card path-teams">
+        <div class="path-label">
+          <span class="path-label-dot"></span>
+          For teams & protocols
+        </div>
+        <h3 class="path-h3">Deploy smarter.<br>Reward better.</h3>
+        <p class="path-desc">Deploy vaults and reward pools on Mintware. Attribution handles the scoring — distributions flow automatically to participants who actually contribute, not just whoever holds the most.</p>
+        <ul class="path-features">
+          <li><span class="path-check">✓</span>Deploy social LP vaults</li>
+          <li><span class="path-check">✓</span>Score-weighted reward pools</li>
+          <li><span class="path-check">✓</span>On-chain fee routing via Attribution</li>
+          <li><span class="path-check">✓</span>One-line protocol plugin integration</li>
+          <li><span class="path-check">✓</span>Real-time analytics dashboard</li>
+        </ul>
+        <div>
+          <button class="path-btn">Join waitlist →</button>
+          <div class="path-coming">
+            <span class="path-coming-dot"></span>
+            Team dashboard — coming soon
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">
+    <div class="footer-logo-mark">
+      <svg viewBox="0 0 14 14" width="13" height="13" fill="white"><path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5Z"/></svg>
+    </div>
+    Mintware
+  </div>
+  <div class="footer-links">
+    <a href="#">Docs</a>
+    <a href="#">Attribution Explorer</a>
+    <a href="#">GitHub</a>
+    <a href="#">Twitter</a>
+    <a href="#">Discord</a>
+  </div>
+  <div class="footer-copy">© 2026 Mintware. Powered by Attribution.</div>
+</footer>
+
+<script>
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t)t.scrollIntoView({behavior:'smooth'});
+  });
+});
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.style.opacity='1';
+      e.target.style.transform='translateY(0)';
+    }
+  });
+},{threshold:0.1});
+document.querySelectorAll('.how-step,.path-card,.attr-pillar').forEach(el=>{
+  el.style.opacity='0';
+  el.style.transform='translateY(18px)';
+  el.style.transition='opacity 0.5s ease, transform 0.5s ease';
+  obs.observe(el);
+});
+</script>
+</body>
+</html>
